@@ -1,0 +1,13 @@
+{
+  "name": "lint-track-chart",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A tool for tracking and visualizing ESLint progress",
+  "bin": {
+    "lint-track": "./src/lint-toolbox/bin/cli.mjs"
+  },
+  "dependencies": {
+    "inquirer": "^9.2.14",
+    "chalk": "^5.3.0"
+  }
+}

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESLint Analysis Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --warning: #f1c40f;
+            --error: #e74c3c;
+            --bg-dark: #2c3e50;
+            --bg-light: #ecf0f1;
+            --text-dark: #2c3e50;
+            --text-light: #ecf0f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .error { color: var(--error); }
+        .warning { color: var(--warning); }
+        .success { color: var(--secondary); }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-dark);
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .sort-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 0.5rem;
+            color: var(--text-light);
+        }
+
+        .sort-button:hover {
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ESLint Analysis Report</h1>
+            <p>Generated on: <span id="timestamp"></span></p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Files</h3>
+                <div class="stat-value" id="total-files">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Files with Issues</h3>
+                <div class="stat-value warning" id="files-with-issues">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Errors</h3>
+                <div class="stat-value error" id="total-errors">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Warnings</h3>
+                <div class="stat-value warning" id="total-warnings">0</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="trend-chart"></canvas>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('rules')">Rules</button>
+            <button class="tab" onclick="showTab('files')">Files</button>
+            <button class="tab" onclick="showTab('directories')">Directories</button>
+        </div>
+
+        <div id="rules" class="tab-content active">
+            <input type="text" class="search-box" placeholder="Search rules..." onkeyup="filterTable('rules-table', 0)">
+            <table id="rules-table">
+                <thead>
+                    <tr>
+                        <th>Rule <button class="sort-button" onclick="sortTable('rules-table', 0)">↕</button></th>
+                        <th>Count <button class="sort-button" onclick="sortTable('rules-table', 1)">↕</button></th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="files" class="tab-content">
+            <input type="text" class="search-box" placeholder="Search files..." onkeyup="filterTable('files-table', 0)">
+            <table id="files-table">
+                <thead>
+                    <tr>
+                        <th>File <button class="sort-button" onclick="sortTable('files-table', 0)">↕</button></th>
+                        <th>Errors <button class="sort-button" onclick="sortTable('files-table', 1)">↕</button></th>
+                        <th>Warnings <button class="sort-button" onclick="sortTable('files-table', 2)">↕</button></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="directories" class="tab-content">
+            <input type="text" class="search-box" placeholder="Search directories..." onkeyup="filterTable('directories-table', 0)">
+            <table id="directories-table">
+                <thead>
+                    <tr>
+                        <th>Directory <button class="sort-button" onclick="sortTable('directories-table', 0)">↕</button></th>
+                        <th>Issues <button class="sort-button" onclick="sortTable('directories-table', 1)">↕</button></th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Populate report data
+        const reportData = {REPORT_DATA};
+
+        document.getElementById('timestamp').textContent = new Date(reportData.timestamp).toLocaleString();
+        document.getElementById('total-files').textContent = reportData.stats.totalFiles;
+        document.getElementById('files-with-issues').textContent = reportData.stats.filesWithIssues;
+        document.getElementById('total-errors').textContent = reportData.stats.errors;
+        document.getElementById('total-warnings').textContent = reportData.stats.warnings;
+
+        // Create trend chart
+        const ctx = document.getElementById('trend-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: reportData.trend.dates,
+                datasets: [
+                    {
+                        label: 'Errors',
+                        data: reportData.trend.errors,
+                        borderColor: '#e74c3c',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Warnings',
+                        data: reportData.trend.warnings,
+                        borderColor: '#f1c40f',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Issue Trends Over Time'
+                    }
+                }
+            }
+        });
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Table sorting
+        function sortTable(tableId, column) {
+            const table = document.getElementById(tableId);
+            const rows = Array.from(table.getElementsByTagName('tr'));
+            const headers = rows.shift();
+            
+            rows.sort((a, b) => {
+                const aValue = a.getElementsByTagName('td')[column].textContent;
+                const bValue = b.getElementsByTagName('td')[column].textContent;
+                return isNaN(aValue) ? aValue.localeCompare(bValue) : Number(aValue) - Number(bValue);
+            });
+            
+            table.tBodies[0].append(...rows);
+        }
+
+        // Table filtering
+        function filterTable(tableId, column) {
+            const input = event.target;
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cell = rows[i].getElementsByTagName('td')[column];
+                if (cell) {
+                    const text = cell.textContent.toLowerCase();
+                    rows[i].style.display = text.includes(filter) ? '' : 'none';
+                }
+            }
+        }
+
+        // Populate tables
+        function populateTables() {
+            // Rules table
+            const rulesBody = document.querySelector('#rules-table tbody');
+            reportData.ruleStats.forEach(({rule, count}) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${rule}</td>
+                    <td>${count}</td>
+                    <td>${count > 10 ? '<span class="error">High</span>' : count > 5 ? '<span class="warning">Medium</span>' : '<span class="success">Low</span>'}</td>
+                `;
+                rulesBody.appendChild(row);
+            });
+
+            // Files table
+            const filesBody = document.querySelector('#files-table tbody');
+            reportData.worstFiles.forEach(({file, errors, warnings}) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${file}</td>
+                    <td class="error">${errors}</td>
+                    <td class="warning">${warnings}</td>
+                `;
+                filesBody.appendChild(row);
+            });
+
+            // Directories table
+            const dirsBody = document.querySelector('#directories-table tbody');
+            reportData.issuesByDirectory.forEach(({directory, total, errors, warnings}) => {
+                const progress = Math.max(0, Math.min(100, 100 - (total / reportData.stats.totalFiles * 100)));
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${directory}</td>
+                    <td>${total}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </td>
+                `;
+                dirsBody.appendChild(row);
+            });
+        }
+
+        populateTables();
+    </script>
+</body>
+</html>
