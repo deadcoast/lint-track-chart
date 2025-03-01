@@ -7,10 +7,12 @@ import inquirer from 'inquirer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
-import fs from 'fs/promises';
+import fs from 'fs';
+import fsPromises from 'fs/promises';
 
 import defaultConfig from '../config/default.js';
 import { getCurrentTheme } from '../lib/themes.js';
+import { interactive } from '../lib/commands/interactive.js';
 import {
     ensureDirectoryExists,
     readJsonSafe,
@@ -113,7 +115,7 @@ class CLI {
         const pluginsDir = this.config.plugins.directory;
         if (!fs.existsSync(pluginsDir)) return;
 
-        const plugins = await fs.readdir(pluginsDir);
+        const plugins = await fsPromises.readdir(pluginsDir);
         for (const plugin of plugins) {
             try {
                 const pluginPath = path.join(pluginsDir, plugin);
@@ -334,4 +336,37 @@ class CLI {
 export const cli = new CLI();
 
 // Initialize CLI when imported
+// Define CLI commands for direct usage
+program
+  .option('-n, --non-interactive', 'Run in non-interactive mode')
+  .option('-t, --track', 'Run linting analysis')
+  .option('-c, --compare', 'Compare with previous version')
+  .option('-f, --fix <rule>', 'Fix specific ESLint rule')
+  .option('-v, --view', 'View progress and statistics')
+  .option('--theme <name>', 'Set theme')
+  .option('--html', 'Generate HTML report')
+  .parse(process.argv);
+
+const options = program.opts();
+
+// If any specific command is provided, run in non-interactive mode
+if (options.nonInteractive || 
+    options.track || 
+    options.compare || 
+    options.fix || 
+    options.view || 
+    options.theme || 
+    options.html) {
+    // Handle direct CLI commands
+    await cli.initialize();
+    if (options.track) await cli.track();
+    if (options.compare) await cli.compare();
+    if (options.fix) await cli.fix(options.fix);
+    if (options.view) await cli.chart();
+    if (options.theme) await cli.setTheme(options.theme);
+    if (options.html) await cli.generateHtmlReport();
+} else {
+    // Default to interactive mode
+    interactive();
+}
 await cli.initialize();

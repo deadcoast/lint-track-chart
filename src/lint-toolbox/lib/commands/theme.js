@@ -1,6 +1,41 @@
 import chalk from 'chalk';
 
 /**
+ * Theme command implementation
+ */
+export const theme = async (options) => {
+  const { list, set, preview } = options;
+
+  if (list) {
+    const themes = getAvailableThemes();
+    console.log('Available themes:\n');
+    themes.forEach(({ name, description }) => {
+      console.log(`${name}: ${description}`);
+    });
+    return;
+  }
+
+  if (preview) {
+    const currentTheme = getCurrentThemeName();
+    previewTheme(currentTheme);
+    return;
+  }
+
+  if (set) {
+    if (setTheme(set)) {
+      console.log(`Theme changed to: ${set}`);
+      previewTheme(set);
+    } else {
+      console.error(`Theme '${set}' not found`);
+    }
+    return;
+  }
+
+  // Default to showing current theme
+  console.log(`Current theme: ${getCurrentThemeName()}`);
+};
+
+/**
  * Theme definitions for the CLI interface
  */
 export const themes = {

@@ -9,7 +9,7 @@ import config from '../../config/default.js';
 /**
  * Fix specific ESLint rules interactively
  */
-export async function fixEslintRule() {
+export const fix = async (options) => {
   console.clear();
   console.log("\n" + getCurrentTheme().titleStyle("✓ Fix ESLint Rules"));
 

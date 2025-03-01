@@ -7,7 +7,7 @@ import config from '../../config/default.js';
 /**
  * Generate and display progress chart with detailed analytics
  */
-export async function viewProgressChart() {
+export const chart = async (options) => {
   console.clear();
   console.log("\n" + getCurrentTheme().titleStyle("✓ Viewing Progress & Statistics"));
 

@@ -8,7 +8,7 @@ import config from '../../config/default.js';
 /**
  * Track current linting status and progress
  */
-export async function trackLintingProgress() {
+export const track = async (options = {}) => {
   console.clear();
   console.log("\n" + getCurrentTheme().titleStyle("✓ Tracking Linting Progress"));
 
@@ -21,11 +21,20 @@ export async function trackLintingProgress() {
       }
     });
 
+    // Determine source path
+    const sourcePath = options.path || process.cwd();
+    const sourceGlob = options.type === 'custom' ? options.path : '.';
+    
     // Run ESLint analysis
     console.log('\nAnalyzing codebase...');
+    const eslintCommand = `npx eslint ${sourceGlob} --format json`;
+    
     const eslintOutput = execSync(
-      `npx eslint ${config.sourceGlob} --format json`,
-      { encoding: 'utf8' }
+      eslintCommand,
+      { 
+        encoding: 'utf8',
+        cwd: sourcePath
+      }
     );
     
     const eslintResults = JSON.parse(eslintOutput);

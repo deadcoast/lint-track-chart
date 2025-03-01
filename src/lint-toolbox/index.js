@@ -5,19 +5,20 @@ import { getCurrentTheme } from './lib/themes.js';
 import { commandExists } from './lib/utils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
 
 // Command imports
-import { trackCommand } from './lib/commands/track.js';
-import { compareCommand } from './lib/commands/compare.js';
-import { fixCommand } from './lib/commands/fix.js';
-import { chartCommand } from './lib/commands/chart.js';
-import { themeCommand } from './lib/commands/theme.js';
+import { track } from './lib/commands/track.js';
+import { compare } from './lib/commands/compare.js';
+import { fix } from './lib/commands/fix.js';
+import { chart } from './lib/commands/chart.js';
+import { theme } from './lib/commands/theme.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Version and description
-const packageJson = JSON.parse(await import(path.join(__dirname, 'package.json'), { assert: { type: 'json' } }));
+const packageJson = JSON.parse(await fs.readFile(path.join(__dirname, 'package.json'), 'utf8'));
 const VERSION = packageJson.version;
 const DESCRIPTION = 'Advanced ESLint tracking and visualization tool';
 
@@ -57,7 +58,7 @@ async function main() {
         .option('-e, --exclude <patterns...>', 'Glob patterns to exclude')
         .option('--fix', 'Automatically fix problems')
         .option('--max-warnings <number>', 'Number of warnings to trigger nonzero exit code')
-        .action(trackCommand);
+        .action(track);
 
     // Compare Command
     program
@@ -67,7 +68,7 @@ async function main() {
         .option('-t, --target <commit>', 'Target commit/branch for comparison')
         .option('-d, --detailed', 'Show detailed comparison')
         .option('--stat', 'Show statistics only')
-        .action(compareCommand);
+        .action(compare);
 
     // Fix Command
     program
@@ -77,7 +78,7 @@ async function main() {
         .option('-a, --auto', 'Automatically fix safe rules')
         .option('--dry-run', 'Show what would be fixed without making changes')
         .option('--fix-type <type>', 'Specify the type of fixes to apply (problem, suggestion, layout)')
-        .action(fixCommand);
+        .action(fix);
 
     // Chart Command
     program
@@ -88,7 +89,7 @@ async function main() {
         .option('--width <pixels>', 'Chart width in pixels', '800')
         .option('--height <pixels>', 'Chart height in pixels', '600')
         .option('--interactive', 'Generate interactive HTML chart')
-        .action(chartCommand);
+        .action(chart);
 
     // Theme Command
     program
@@ -100,7 +101,7 @@ async function main() {
         .option('--create <name>', 'Create a new theme')
         .option('--export <file>', 'Export themes to file')
         .option('--import <file>', 'Import themes from file')
-        .action(themeCommand);
+        .action(theme);
 
     // Error handling
     program.showHelpAfterError('(add --help for additional information)');

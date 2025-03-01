@@ -7,7 +7,7 @@ import config from '../../config/default.js';
 /**
  * Compare linting results between different versions
  */
-export async function compareLintingVersions() {
+export const compare = async (options) => {
   console.clear();
   console.log("\n" + getCurrentTheme().titleStyle("✓ Comparing Linting Versions"));
 
