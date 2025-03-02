@@ -11,18 +11,18 @@ import config from '../../config/default.js';
  */
 export const fix = async (options) => {
   console.clear();
-  console.log("\n" + getCurrentTheme().titleStyle("✓ Fix ESLint Rules"));
+  console.log('\n' + getCurrentTheme().titleStyle('✓ Fix ESLint Rules'));
 
   try {
     // Get current ESLint issues
     console.log('Running ESLint to get current issues...');
     const eslintOutput = execSync(
       `npx eslint ${config.sourceGlob} --format json`,
-      { encoding: 'utf8' }
+      { encoding: 'utf8' },
     );
-    
+
     const eslintResults = JSON.parse(eslintOutput);
-    
+
     if (!eslintResults.length) {
       console.log(getCurrentTheme().successStyle('\n🎉 No ESLint issues found!'));
       await waitForEnter();
@@ -31,8 +31,8 @@ export const fix = async (options) => {
 
     // Collect all unique rules with their counts
     const ruleStats = new Map();
-    eslintResults.forEach(result => {
-      result.messages.forEach(msg => {
+    eslintResults.forEach((result) => {
+      result.messages.forEach((msg) => {
         const count = ruleStats.get(msg.ruleId) || 0;
         ruleStats.set(msg.ruleId, count + 1);
       });
@@ -46,25 +46,25 @@ export const fix = async (options) => {
         rule,
         count,
         examples: eslintResults
-          .flatMap(result => 
+          .flatMap((result) =>
             result.messages
-              .filter(msg => msg.ruleId === rule)
-              .map(msg => ({
+              .filter((msg) => msg.ruleId === rule)
+              .map((msg) => ({
                 file: result.filePath,
                 line: msg.line,
-                message: msg.message
-              }))
+                message: msg.message,
+              })),
           )
-          .slice(0, 3) // Show up to 3 examples
+          .slice(0, 3), // Show up to 3 examples
       }));
 
-    console.log(`\n${getCurrentTheme().titleStyle("=== ESLINT RULES SUMMARY ===")}`);
+    console.log(`\n${getCurrentTheme().titleStyle('=== ESLINT RULES SUMMARY ===')}`);
     console.log(`Found ${getCurrentTheme().highlightStyle(sortedRules.length.toString())} rules with issues\n`);
 
     // Display rule statistics
     sortedRules.forEach(({ rule, count, examples }) => {
       console.log(`${getCurrentTheme().errorStyle(rule)}: ${getCurrentTheme().warningStyle(count.toString())} occurrences`);
-      examples.forEach(ex => {
+      examples.forEach((ex) => {
         console.log(`  ${getCurrentTheme().infoStyle('→')} ${path.relative(process.cwd(), ex.file)}:${ex.line}`);
         console.log(`    ${getCurrentTheme().optionStyle(ex.message)}`);
       });
@@ -79,20 +79,20 @@ export const fix = async (options) => {
         message: 'Which rule would you like to fix?',
         choices: sortedRules.map(({ rule, count }) => ({
           name: `${rule} (${count} issues)`,
-          value: rule
-        }))
-      }
+          value: rule,
+        })),
+      },
     ]);
 
     // Get affected files for the selected rule
     const affectedFiles = new Set();
-    eslintResults.forEach(result => {
-      if (result.messages.some(msg => msg.ruleId === selectedRule)) {
+    eslintResults.forEach((result) => {
+      if (result.messages.some((msg) => msg.ruleId === selectedRule)) {
         affectedFiles.add(result.filePath);
       }
     });
 
-    console.log(`\n${getCurrentTheme().titleStyle("=== FIX SUMMARY ===")}`);
+    console.log(`\n${getCurrentTheme().titleStyle('=== FIX SUMMARY ===')}`);
     console.log(`Rule: ${getCurrentTheme().errorStyle(selectedRule)}`);
     console.log(`Affected files: ${getCurrentTheme().warningStyle(affectedFiles.size.toString())}`);
 
@@ -101,8 +101,8 @@ export const fix = async (options) => {
         type: 'confirm',
         name: 'confirm',
         message: 'Would you like to attempt to fix this rule automatically?',
-        default: true
-      }
+        default: true,
+      },
     ]);
 
     if (!confirm) {
@@ -112,28 +112,28 @@ export const fix = async (options) => {
     }
 
     // Attempt to fix the selected rule
-    console.log(`\n${getCurrentTheme().titleStyle("=== FIXING ISSUES ===")}`);
+    console.log(`\n${getCurrentTheme().titleStyle('=== FIXING ISSUES ===')}`);
     console.log('Running ESLint fix...');
 
     const fixCommand = `npx eslint ${config.sourceGlob} --fix --rule '{"${selectedRule}": "error"}'`;
-    
+
     try {
       execSync(fixCommand, { encoding: 'utf8' });
-      
+
       // Check remaining issues
       const afterFixOutput = execSync(
         `npx eslint ${config.sourceGlob} --format json`,
-        { encoding: 'utf8' }
+        { encoding: 'utf8' },
       );
-      
+
       const afterFixResults = JSON.parse(afterFixOutput);
       const remainingCount = afterFixResults
-        .flatMap(r => r.messages)
-        .filter(m => m.ruleId === selectedRule)
+        .flatMap((r) => r.messages)
+        .filter((m) => m.ruleId === selectedRule)
         .length;
 
       const fixedCount = ruleStats.get(selectedRule) - remainingCount;
-      
+
       if (fixedCount > 0) {
         console.log(getCurrentTheme().successStyle(`\n✓ Successfully fixed ${fixedCount} issues!`));
         if (remainingCount > 0) {
@@ -146,12 +146,12 @@ export const fix = async (options) => {
 
       // Show example of remaining issues if any
       if (remainingCount > 0) {
-        console.log(`\n${getCurrentTheme().titleStyle("=== REMAINING ISSUES ===")}`);
-        afterFixResults.forEach(result => {
-          const ruleMessages = result.messages.filter(m => m.ruleId === selectedRule);
+        console.log(`\n${getCurrentTheme().titleStyle('=== REMAINING ISSUES ===')}`);
+        afterFixResults.forEach((result) => {
+          const ruleMessages = result.messages.filter((m) => m.ruleId === selectedRule);
           if (ruleMessages.length > 0) {
             console.log(`\n${getCurrentTheme().highlightStyle(path.relative(process.cwd(), result.filePath))}:`);
-            ruleMessages.forEach(msg => {
+            ruleMessages.forEach((msg) => {
               console.log(`  Line ${msg.line}: ${getCurrentTheme().optionStyle(msg.message)}`);
             });
           }
@@ -167,4 +167,4 @@ export const fix = async (options) => {
   }
 
   await waitForEnter();
-}
+};

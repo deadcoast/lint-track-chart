@@ -12,8 +12,8 @@ export async function waitForEnter(message = 'Press Enter to return to the main 
       type: 'input',
       name: 'continue',
       message: getCurrentTheme().dimStyle(message),
-      prefix: '→'
-    }
+      prefix: '→',
+    },
   ]);
 }
 
@@ -50,19 +50,25 @@ export function updateProgressBar(current, total, message = '', barLength = 30) 
   const filled = Math.floor(barLength * progress);
   const empty = barLength - filled;
   const theme = getCurrentTheme();
-  
-  const bar = theme.successStyle('█'.repeat(filled)) + 
+
+  const bar = theme.successStyle('█'.repeat(filled)) +
               theme.dimStyle('░'.repeat(empty));
-  
+
   const percent = (progress * 100).toFixed(1);
   const status = `${current}/${total} (${percent}%)`;
-  
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
-  process.stdout.write(
-    `${message ? message + ' ' : ''}${bar} ${theme.infoStyle(status)}`
-  );
-  
+
+  // Check if stdout is a TTY before using terminal-specific functions
+  if (process.stdout.isTTY) {
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write(
+      `${message ? message + ' ' : ''}${bar} ${theme.infoStyle(status)}`,
+    );
+  } else {
+    // Fallback for non-TTY environments (e.g., when run from Node.js script)
+    console.log(`${message ? message + ' ' : ''}${bar} ${theme.infoStyle(status)}`);
+  }
+
   if (current === total) {
     process.stdout.write('\n');
   }
@@ -79,27 +85,27 @@ export function safeExec(command, progressMessage = '') {
     if (progressMessage) {
       process.stdout.write(`${progressMessage}... `);
     }
-    
+
     const output = execSync(command, {
       encoding: 'utf8',
-      maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
     });
-    
+
     if (progressMessage) {
       console.log(getCurrentTheme().successStyle('✓'));
     }
-    
+
     return output;
   } catch (error) {
     if (progressMessage) {
       console.log(getCurrentTheme().errorStyle('✗'));
     }
-    
+
     // If the error contains useful information, preserve it
     if (error.stdout || error.stderr) {
       return error.stdout || error.stderr;
     }
-    
+
     throw error;
   }
 }
@@ -114,15 +120,15 @@ export async function withSpinner(promise, message) {
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let i = 0;
   const theme = getCurrentTheme();
-  
+
   const spinner = setInterval(() => {
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
     process.stdout.write(
-      `${theme.infoStyle(frames[i++ % frames.length])} ${message}`
+      `${theme.infoStyle(frames[i++ % frames.length])} ${message}`,
     );
   }, 80);
-  
+
   try {
     const result = await promise;
     clearInterval(spinner);
@@ -148,12 +154,12 @@ export function formatFileSize(bytes) {
   const units = ['B', 'KB', 'MB', 'GB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
@@ -166,27 +172,27 @@ export function formatFileSize(bytes) {
 export function createBox(message, title = '') {
   const lines = message.split('\n');
   const width = Math.max(
-    ...lines.map(line => line.length),
-    title.length
+    ...lines.map((line) => line.length),
+    title.length,
   );
-  
+
   const theme = getCurrentTheme();
   const box = [];
-  
+
   // Top border with optional title
   if (title) {
     box.push(`╭─${title}${'─'.repeat(Math.max(0, width - title.length + 2))}╮`);
   } else {
     box.push(`╭${'─'.repeat(width + 2)}╮`);
   }
-  
+
   // Message lines
-  lines.forEach(line => {
+  lines.forEach((line) => {
     box.push(`│ ${line.padEnd(width)} │`);
   });
-  
+
   // Bottom border
   box.push(`╰${'─'.repeat(width + 2)}╯`);
-  
+
   return box.join('\n');
 }

@@ -49,7 +49,7 @@ export const themes = {
     optionStyle: chalk.white,
     dimStyle: chalk.gray,
     name: 'Default (Blue)',
-    description: 'Classic blue theme with high contrast'
+    description: 'Classic blue theme with high contrast',
   },
   ocean: {
     titleStyle: chalk.bold.cyan,
@@ -61,7 +61,7 @@ export const themes = {
     optionStyle: chalk.whiteBright,
     dimStyle: chalk.gray,
     name: 'Ocean',
-    description: 'Calming cyan and blue tones'
+    description: 'Calming cyan and blue tones',
   },
   forest: {
     titleStyle: chalk.bold.green,
@@ -73,7 +73,7 @@ export const themes = {
     optionStyle: chalk.white,
     dimStyle: chalk.gray,
     name: 'Forest',
-    description: 'Nature-inspired green theme'
+    description: 'Nature-inspired green theme',
   },
   sunset: {
     titleStyle: chalk.bold.magenta,
@@ -85,7 +85,7 @@ export const themes = {
     optionStyle: chalk.whiteBright,
     dimStyle: chalk.gray,
     name: 'Sunset',
-    description: 'Warm magenta and orange tones'
+    description: 'Warm magenta and orange tones',
   },
   monochrome: {
     titleStyle: chalk.bold.white,
@@ -97,8 +97,8 @@ export const themes = {
     optionStyle: chalk.white,
     dimStyle: chalk.gray,
     name: 'Monochrome',
-    description: 'Clean black and white aesthetic'
-  }
+    description: 'Clean black and white aesthetic',
+  },
 };
 
 // Store current theme
@@ -132,7 +132,7 @@ export function getAvailableThemes() {
   return Object.entries(themes).map(([id, theme]) => ({
     id,
     name: theme.name,
-    description: theme.description
+    description: theme.description,
   }));
 }
 

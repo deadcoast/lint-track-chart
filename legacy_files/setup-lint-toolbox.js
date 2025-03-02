@@ -10,10 +10,10 @@ const BASE_DIR = path.resolve('./lint-toolbox');
 // Directory structure
 const directories = [
   '',                   // Base directory
-  'lib',                // Library core 
+  'lib',                // Library core
   'lib/commands',       // Command implementations
   'templates',          // HTML/report templates
-  'config'              // Configuration
+  'config',              // Configuration
 ];
 
 // Files to create with their content
@@ -45,7 +45,7 @@ const files = [
     "inquirer": "^9.2.12"
   }
 }
-`
+`,
   },
   {
     path: 'index.js',
@@ -100,7 +100,7 @@ async function main() {
 
 // Start the program
 main();
-`
+`,
   },
   {
     path: 'lib/cli.js',
@@ -212,7 +212,7 @@ export function updateProgressBar(current, total, message = '', barLength = 30) 
 export async function waitForEnter(message = 'Press Enter to return to the main menu') {
   await inquirer.prompt([{ type: 'input', name: 'dummy', message }]);
 }
-`
+`,
   },
   {
     path: 'lib/themes.js',
@@ -279,7 +279,7 @@ export function setCurrentTheme(theme) {
 export function getAllThemes() {
   return Object.keys(themes);
 }
-`
+`,
   },
   {
     path: 'lib/utils.js',
@@ -333,7 +333,7 @@ export function safeExec(command, progressMessage = 'Processing') {
     throw error;
   }
 }
-`
+`,
   },
   {
     path: 'config/default.js',
@@ -356,7 +356,7 @@ export default {
   // Display settings
   topIssuesCount: 10
 };
-`
+`,
   },
   {
     path: 'lib/commands/track.js',
@@ -396,7 +396,7 @@ export async function trackLintingProgress() {
   
   await waitForEnter();
 }
-`
+`,
   },
   {
     path: 'lib/commands/chart.js',
@@ -423,7 +423,7 @@ export async function viewProgressChart() {
   
   await waitForEnter();
 }
-`
+`,
   },
   {
     path: 'lib/commands/html.js',
@@ -451,7 +451,7 @@ export async function generateHtmlReport() {
   
   await waitForEnter();
 }
-`
+`,
   },
   {
     path: 'lib/commands/fix.js',
@@ -480,7 +480,7 @@ export async function fixEslintRule() {
   
   await waitForEnter();
 }
-`
+`,
   },
   {
     path: 'lib/commands/compare.js',
@@ -507,7 +507,7 @@ export async function compareLintingVersions() {
   
   await waitForEnter();
 }
-`
+`,
   },
   {
     path: 'lib/commands/theme.js',
@@ -544,7 +544,7 @@ export async function changeTheme() {
   
   await waitForEnter();
 }
-`
+`,
   },
   {
     path: 'templates/report.html',
@@ -718,7 +718,7 @@ export async function changeTheme() {
   </script>
 </body>
 </html>
-`
+`,
   },
   {
     path: 'README.md',
@@ -797,15 +797,15 @@ To add new commands:
 ## License
 
 MIT
-`
-  }
+`,
+  },
 ];
 
 // Create directories and files
 console.log('Creating directory structure for lint-toolbox...');
 
 // Create directories
-directories.forEach(dir => {
+directories.forEach((dir) => {
   const fullPath = path.join(BASE_DIR, dir);
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });
@@ -814,7 +814,7 @@ directories.forEach(dir => {
 });
 
 // Create files
-files.forEach(file => {
+files.forEach((file) => {
   const fullPath = path.join(BASE_DIR, file.path);
   fs.writeFileSync(fullPath, file.content);
   console.log(`Created file: ${fullPath}`);
@@ -823,9 +823,9 @@ files.forEach(file => {
 // Make index.js executable
 try {
   fs.chmodSync(path.join(BASE_DIR, 'index.js'), '755');
-  console.log(`Made index.js executable`);
+  console.log('Made index.js executable');
 } catch (error) {
-  console.log(`Note: Could not make index.js executable. You may need to do this manually.`);
+  console.log('Note: Could not make index.js executable. You may need to do this manually.');
 }
 
 // Final instructions

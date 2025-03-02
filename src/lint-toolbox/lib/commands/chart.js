@@ -3,31 +3,43 @@ import path from 'path';
 import { getCurrentTheme } from '../themes.js';
 import { waitForEnter, updateProgressBar } from '../cli.js';
 import config from '../../config/default.js';
+import { advancedChart } from './advancedChart.js';
 
 /**
  * Generate and display progress chart with detailed analytics
  */
 export const chart = async (options) => {
+  const viewType = options.type || 'trend';
+  
+  // Use the advanced chart for trend analysis
+  if (viewType === 'trend') {
+    return advancedChart(options);
+  }
+  
   console.clear();
-  console.log("\n" + getCurrentTheme().titleStyle("✓ Viewing Progress & Statistics"));
+  console.log('\n' + getCurrentTheme().titleStyle('✓ Viewing Progress & Statistics'));
 
   try {
+    // Construct the log file path
+    const reportDir = path.join(process.cwd(), config.paths.reports);
+    const logFile = path.join(reportDir, 'lint.log');
+    
     // Check if log file exists
-    if (!fs.existsSync(config.logFile)) {
-      console.log(getCurrentTheme().warningStyle(`No ${config.logFile} file found.`));
-      console.log(`\nRun the linting analysis first to create it.`);
+    if (!fs.existsSync(logFile)) {
+      console.log(getCurrentTheme().warningStyle(`No ${logFile} file found.`));
+      console.log('\nRun the linting analysis first to create it.');
       await waitForEnter();
       return;
     }
 
     // Read and parse log file
-    const logContent = fs.readFileSync(config.logFile, 'utf8');
+    const logContent = fs.readFileSync(logFile, 'utf8');
     const entries = [];
     let currentDate = '';
 
     console.log('Parsing log entries...');
-    const logLines = logContent.split('\n').filter(line => line.trim());
-    
+    const logLines = logContent.split('\n').filter((line) => line.trim());
+
     logLines.forEach((line, index) => {
       updateProgressBar(index + 1, logLines.length, `Parsing line ${index + 1}/${logLines.length}`);
 
@@ -35,7 +47,7 @@ export const chart = async (options) => {
         currentDate = line.replace(/=+/g, '').trim();
       } else if (line.includes('problems')) {
         const match = line.match(
-          /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/
+          /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/,
         );
         if (match) {
           entries.push({
@@ -50,7 +62,7 @@ export const chart = async (options) => {
     });
 
     if (entries.length === 0) {
-      console.log(`\n${getCurrentTheme().warningStyle(`No data entries found in ${config.logFile}`)}`);
+      console.log(`\n${getCurrentTheme().warningStyle(`No data entries found in ${logFile}`)}`);
       console.log('Make sure the file contains entries in the correct format:');
       console.log('===== DATE =====');
       console.log('X problems (Y errors, Z warnings)');
@@ -59,14 +71,14 @@ export const chart = async (options) => {
     }
 
     // Find the maximum number of issues to scale the chart
-    const maxIssues = Math.max(...entries.map(e => e.total));
+    const maxIssues = Math.max(...entries.map((e) => e.total));
     const scale = 40; // Maximum width of chart
 
-    console.log(`\n${getCurrentTheme().titleStyle("=== ESLINT/PRETTIER LINTING PROGRESS CHART ===")}`);
-    console.log(`${getCurrentTheme().optionStyle("Date       | Errors | Warnings | Format | Progress")}`);
+    console.log(`\n${getCurrentTheme().titleStyle('=== ESLINT/PRETTIER LINTING PROGRESS CHART ===')}`);
+    console.log(`${getCurrentTheme().optionStyle('Date       | Errors | Warnings | Format | Progress')}`);
     console.log('-'.repeat(70));
 
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       const dateStr = entry.date.substring(0, 10);
       const errorsStr = entry.errors.toString().padStart(6);
       const warningsStr = entry.warnings.toString().padStart(8);
@@ -88,7 +100,7 @@ export const chart = async (options) => {
       }
 
       console.log(
-        `${dateStr} | ${getCurrentTheme().errorStyle(errorsStr)} | ${getCurrentTheme().warningStyle(warningsStr)} | ${getCurrentTheme().infoStyle(formattingStr)} | ${progressStyle(`${bar} ${progress}%`)}`
+        `${dateStr} | ${getCurrentTheme().errorStyle(errorsStr)} | ${getCurrentTheme().warningStyle(warningsStr)} | ${getCurrentTheme().infoStyle(formattingStr)} | ${progressStyle(`${bar} ${progress}%`)}`,
       );
     });
 
@@ -99,7 +111,7 @@ export const chart = async (options) => {
       const reduction = first.total - last.total;
       const percentReduction = ((reduction / first.total) * 100).toFixed(1);
 
-      console.log(`\n${getCurrentTheme().titleStyle("=== TREND ANALYSIS ===")}`);
+      console.log(`\n${getCurrentTheme().titleStyle('=== TREND ANALYSIS ===')}`);
       console.log(`Starting issues: ${getCurrentTheme().optionStyle(`${first.total}`)}`);
       console.log(`Current issues: ${getCurrentTheme().optionStyle(`${last.total}`)}`);
 
@@ -116,27 +128,27 @@ export const chart = async (options) => {
         completionDate.setDate(completionDate.getDate() + daysRemaining);
 
         console.log(
-          `Average fix rate: ${getCurrentTheme().infoStyle(`${fixRate.toFixed(1)} issues per day`)}`
+          `Average fix rate: ${getCurrentTheme().infoStyle(`${fixRate.toFixed(1)} issues per day`)}`,
         );
         console.log(
-          `Estimated completion: ${getCurrentTheme().optionStyle(`${daysRemaining} days`)} (around ${getCurrentTheme().successStyle(`${completionDate.toLocaleDateString()}`)})`
+          `Estimated completion: ${getCurrentTheme().optionStyle(`${daysRemaining} days`)} (around ${getCurrentTheme().successStyle(`${completionDate.toLocaleDateString()}`)})`,
         );
 
         // Show additional stats
-        console.log(`\n${getCurrentTheme().titleStyle("=== DETAILED ANALYSIS ===")}`);
+        console.log(`\n${getCurrentTheme().titleStyle('=== DETAILED ANALYSIS ===')}`);
 
         // Error reduction
         const errorReduction = first.errors - last.errors;
         const errorPercentReduction = ((errorReduction / Math.max(1, first.errors)) * 100).toFixed(1);
         console.log(
-          `Error reduction: ${getCurrentTheme().errorStyle(`${errorReduction} (${errorPercentReduction}%)`)}`
+          `Error reduction: ${getCurrentTheme().errorStyle(`${errorReduction} (${errorPercentReduction}%)`)}`,
         );
 
         // Warning reduction
         const warningReduction = first.warnings - last.warnings;
         const warningPercentReduction = ((warningReduction / Math.max(1, first.warnings)) * 100).toFixed(1);
         console.log(
-          `Warning reduction: ${getCurrentTheme().warningStyle(`${warningReduction} (${warningPercentReduction}%)`)}`
+          `Warning reduction: ${getCurrentTheme().warningStyle(`${warningReduction} (${warningPercentReduction}%)`)}`,
         );
 
         // Formatting reduction if available
@@ -146,35 +158,35 @@ export const chart = async (options) => {
             (formattingReduction / Math.max(1, first.formatting || 1)) * 100
           ).toFixed(1);
           console.log(
-            `Formatting reduction: ${getCurrentTheme().infoStyle(`${formattingReduction} (${formattingPercentReduction}%)`)}`
+            `Formatting reduction: ${getCurrentTheme().infoStyle(`${formattingReduction} (${formattingPercentReduction}%)`)}`,
           );
         }
       }
     }
 
     // Check if detailed data is available
-    const jsonPath = path.join(config.reportDir, config.jsonFilename);
+    const jsonPath = path.join(reportDir, 'lint-results.json');
     if (fs.existsSync(jsonPath)) {
       try {
         const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-        
+
         // Display file statistics
         if (jsonData.worstFiles && jsonData.worstFiles.length > 0) {
-          console.log(`\n${getCurrentTheme().titleStyle("=== FILES WITH MOST ISSUES ===")}`);
+          console.log(`\n${getCurrentTheme().titleStyle('=== FILES WITH MOST ISSUES ===')}`);
           jsonData.worstFiles.slice(0, 5).forEach((file, index) => {
             console.log(`${index + 1}. ${file.file}: ${getCurrentTheme().errorStyle(file.errors.toString())} errors, ${getCurrentTheme().warningStyle(file.warnings.toString())} warnings`);
           });
         }
-        
+
         // Display directory statistics
         if (jsonData.issuesByDirectory && jsonData.issuesByDirectory.length > 0) {
-          console.log(`\n${getCurrentTheme().titleStyle("=== DIRECTORY BREAKDOWN ===")}`);
+          console.log(`\n${getCurrentTheme().titleStyle('=== DIRECTORY BREAKDOWN ===')}`);
           const topDirs = jsonData.issuesByDirectory.slice(0, 5);
-          
+
           // Find max issues for bar scaling
-          const maxDirIssues = Math.max(...topDirs.map(d => d.total));
+          const maxDirIssues = Math.max(...topDirs.map((d) => d.total));
           const barScale = 20; // Scale for the bar chart
-          
+
           topDirs.forEach((dir, index) => {
             const barLength = Math.floor((dir.total / maxDirIssues) * barScale);
             const bar = '█'.repeat(barLength);
@@ -186,8 +198,8 @@ export const chart = async (options) => {
       }
     }
   } catch (error) {
-    console.error(`\n${getCurrentTheme().errorStyle("Error processing log file:")}`, error.message);
+    console.error(`\n${getCurrentTheme().errorStyle('Error processing log file:')}`, error.message);
   }
 
   await waitForEnter();
-}
+};

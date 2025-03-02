@@ -21,24 +21,24 @@ export function ensureDirectoryExists(dirPath) {
  */
 export function getAllFiles(dir, extensions = []) {
   const files = [];
-  
+
   function traverse(currentDir) {
     const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = path.join(currentDir, entry.name);
-      
+
       if (entry.isDirectory()) {
         traverse(fullPath);
       } else if (entry.isFile()) {
-        if (extensions.length === 0 || 
+        if (extensions.length === 0 ||
             extensions.includes(path.extname(entry.name).toLowerCase().slice(1))) {
           files.push(fullPath);
         }
       }
     }
   }
-  
+
   traverse(dir);
   return files;
 }
@@ -64,17 +64,17 @@ export function commandExists(command) {
  */
 export function getSize(path) {
   const stats = fs.statSync(path);
-  
+
   if (stats.isFile()) {
     return stats.size;
   }
-  
+
   if (stats.isDirectory()) {
     return fs.readdirSync(path)
-      .map(file => getSize(path + '/' + file))
+      .map((file) => getSize(path + '/' + file))
       .reduce((acc, size) => acc + size, 0);
   }
-  
+
   return 0;
 }
 
@@ -124,7 +124,7 @@ export function getRelativeTimeString(date) {
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (days > 0) {
     return `${days} day${days === 1 ? '' : 's'} ago`;
   }
@@ -146,13 +146,13 @@ export function createBackup(filePath) {
   if (!fs.existsSync(filePath)) {
     return null;
   }
-  
+
   const ext = path.extname(filePath);
   const base = path.basename(filePath, ext);
   const dir = path.dirname(filePath);
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupPath = path.join(dir, `${base}.${timestamp}${ext}`);
-  
+
   fs.copyFileSync(filePath, backupPath);
   return backupPath;
 }

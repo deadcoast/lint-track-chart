@@ -1,130 +1,11 @@
-import fs from 'fs';
-import path from 'path';
-import { getCurrentTheme } from '../themes.js';
-import { waitForEnter } from '../cli.js';
-import { ensureDirectoryExists } from '../utils.js';
-import { safeExec } from '../cli.js';
-import config from '../../config/default.js';
 
-/**
- * Generate HTML report
- */
-export const html = async (options = {}) => {
-  console.clear();
-  console.log('\n' + getCurrentTheme().titleStyle('✓ Generating HTML Report'));
-
-  try {
-    // Construct the report directory path
-    const reportDir = path.join(process.cwd(), config.paths.reports);
-    
-    // Check if the report directory exists
-    if (!fs.existsSync(reportDir)) {
-      console.log(`${getCurrentTheme().warningStyle(`The report directory '${reportDir}' does not exist.`)}`);
-      console.log('\nPlease run linting analysis first to create it.');
-      await waitForEnter();
-      return;
-    }
-    
-    // Check if JSON data exists
-    const jsonPath = path.join(reportDir, 'lint-results.json');
-    if (!fs.existsSync(jsonPath)) {
-      console.log(`${getCurrentTheme().warningStyle(`No data available at '${jsonPath}'. Please run linting analysis first.`)}`);
-      await waitForEnter();
-      return;
-    }
-
-    // Read the JSON data
-    let jsonData;
-    try {
-      jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-      console.log(`Successfully loaded JSON data from ${jsonPath}`);
-      console.log('JSON data structure:', Object.keys(jsonData));
-      if (jsonData.stats) console.log('Stats available:', Object.keys(jsonData.stats));
-      if (jsonData.ruleStats) console.log('Rule stats length:', jsonData.ruleStats.length);
-      if (jsonData.worstFiles) console.log('Worst files length:', jsonData.worstFiles.length);
-      if (jsonData.issuesByDirectory) console.log('Directory issues length:', jsonData.issuesByDirectory.length);
-    } catch (jsonError) {
-      console.log(`${getCurrentTheme().errorStyle('Error parsing JSON data:')} ${jsonError.message}`);
-      await waitForEnter();
-      return;
-    }
-
-    // Create the HTML report
-    const htmlPath = path.join(reportDir, 'lint-report.html');
-    const chartJsScript = '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>';
-
-    // Get historical data from log file
-    const logFile = path.join(reportDir, 'lint.log');
-    if (!fs.existsSync(logFile)) {
-      console.log(`${getCurrentTheme().warningStyle(`No log file found at '${logFile}'.`)}`);
-      console.log('\nRun the linting analysis first to create it.');
-      await waitForEnter();
-      return;
-    }
-    
-    const logContent = fs.readFileSync(logFile, 'utf8');
-    console.log('Log file content loaded successfully.');
-    
-    // Parse the log file
-    const entries = [];
-    let currentDate = '';
-    
-    logContent.split('\n').forEach(line => {
-      // Check for date headers
-      const dateMatch = line.match(/===== (.+) =====/); 
-      if (dateMatch) {
-        currentDate = dateMatch[1];
-        console.log(`Found date entry: ${currentDate}`);
-      } else {
-        // Check for issue counts
-        const issueMatch = line.match(/(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/);
-        if (issueMatch) {
-          entries.push({
-            date: new Date(currentDate).toLocaleString(),
-            total: parseInt(issueMatch[1], 10), 
-            errors: parseInt(issueMatch[2], 10),
-            warnings: parseInt(issueMatch[3], 10),
-            formatting: issueMatch[4] ? parseInt(issueMatch[4], 10) : 0,
-            files: 0 // Files count not available in this format
-          });
-          console.log(`Added entry with ${issueMatch[1]} total issues`);
-        }
-      }
-    });
-    
-    if (entries.length === 0) {
-      console.log(`${getCurrentTheme().warningStyle('No entries found in log file. The format may be incorrect.')}`);
-      console.log('Log file contents:');
-      console.log(logContent.substring(0, 200) + '...');
-      await waitForEnter();
-      return;
-    }
-    
-    console.log(`Parsed ${entries.length} entries from the log file.`);
-
-    // Make sure jsonData has the expected structure
-    if (!jsonData.stats) jsonData.stats = { errors: 0, warnings: 0, totalFiles: 0, filesWithIssues: 0 };
-    if (!jsonData.worstFiles) jsonData.worstFiles = [];
-    if (!jsonData.issuesByDirectory) jsonData.issuesByDirectory = [];
-    if (!jsonData.ruleStats) jsonData.ruleStats = [];
-    if (!jsonData.issuesByRule) jsonData.issuesByRule = [];
-    
-    // Create safe versions of arrays for the charts
-    const safeEntries = Array.isArray(entries) ? entries : [];
-    const safeRuleStats = Array.isArray(jsonData.ruleStats) ? jsonData.ruleStats : [];
-    const safeWorstFiles = Array.isArray(jsonData.worstFiles) ? jsonData.worstFiles : [];
-    const safeDirectoryIssues = Array.isArray(jsonData.issuesByDirectory) ? jsonData.issuesByDirectory : [];
-    const safeIssuesByRule = Array.isArray(jsonData.issuesByRule) ? jsonData.issuesByRule : [];
-    
-    // Create HTML content
-    const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Linting Report</title>
-  ${chartJsScript}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -231,7 +112,7 @@ export const html = async (options = {}) => {
 <body>
   <div class="header">
     <h1>Linting Report</h1>
-    <p>Generated on ${new Date().toLocaleString()}</p>
+    <p>Generated on 3/1/2025, 9:51:46 PM</p>
   </div>
   
   <div class="summary-box">
@@ -239,23 +120,23 @@ export const html = async (options = {}) => {
     <div class="stat-grid">
       <div class="stat-card">
         <h3>Total Issues</h3>
-        <p style="font-size: 2rem;">${jsonData.stats.errors + jsonData.stats.warnings}</p>
+        <p style="font-size: 2rem;">98</p>
         <div class="progress-bar">
           <div class="progress-bar-fill" style="width: 100%"></div>
         </div>
       </div>
       <div class="stat-card">
         <h3>Errors</h3>
-        <p class="error" style="font-size: 2rem;">${jsonData.stats.errors}</p>
+        <p class="error" style="font-size: 2rem;">2</p>
         <div class="progress-bar">
-          <div class="progress-bar-fill" style="width: ${jsonData.stats.errors / (jsonData.stats.errors + jsonData.stats.warnings) * 100}%; background-color: #e74c3c;"></div>
+          <div class="progress-bar-fill" style="width: 2.0408163265306123%; background-color: #e74c3c;"></div>
         </div>
       </div>
       <div class="stat-card">
         <h3>Warnings</h3>
-        <p class="warning" style="font-size: 2rem;">${jsonData.stats.warnings}</p>
+        <p class="warning" style="font-size: 2rem;">96</p>
         <div class="progress-bar">
-          <div class="progress-bar-fill" style="width: ${jsonData.stats.warnings / (jsonData.stats.errors + jsonData.stats.warnings) * 100}%; background-color: #f39c12;"></div>
+          <div class="progress-bar-fill" style="width: 97.95918367346938%; background-color: #f39c12;"></div>
         </div>
       </div>
       <div class="stat-card">
@@ -284,15 +165,15 @@ export const html = async (options = {}) => {
     
     <div class="summary-box">
       <h3>Progress Statistics</h3>
-      ${entries.length >= 2 ? `
-        <p>Starting with <strong>${entries[0].total}</strong> issues on ${entries[0].date}</p>
-        <p>Currently at <strong>${entries[entries.length-1].total}</strong> issues on ${entries[entries.length-1].date}</p>
-        <p class="${entries[0].total - entries[entries.length-1].total > 0 ? 'success' : 'error'}">
-          ${entries[0].total - entries[entries.length-1].total > 0 ? 'Reduced by' : 'Increased by'} 
-          <strong>${Math.abs(entries[0].total - entries[entries.length-1].total)}</strong> issues
-          (${(Math.abs(entries[0].total - entries[entries.length-1].total) / entries[0].total * 100).toFixed(1)}%)
+      
+        <p>Starting with <strong>97</strong> issues on 3/1/2025, 6:12:40 PM</p>
+        <p>Currently at <strong>98</strong> issues on 3/1/2025, 6:15:19 PM</p>
+        <p class="error">
+          Increased by 
+          <strong>1</strong> issues
+          (1.0%)
         </p>
-      ` : '<p>Not enough data to show trend analysis</p>'}
+      
     </div>
   </div>
   
@@ -324,14 +205,7 @@ export const html = async (options = {}) => {
         </tr>
       </thead>
       <tbody>
-        ${safeIssuesByRule.map((rule, index) => `
-          <tr>
-            <td>${rule.rule}</td>
-            <td>${rule.count}</td>
-            <td class="${rule.errors > 0 ? 'error' : ''}">${rule.errors}</td>
-            <td class="${rule.warnings > 0 ? 'warning' : ''}">${rule.warnings}</td>
-          </tr>
-        `).join('')}
+        
       </tbody>
     </table>
   </div>
@@ -364,14 +238,91 @@ export const html = async (options = {}) => {
         </tr>
       </thead>
       <tbody>
-        ${jsonData.worstFiles.map((file, index) => `
+        
           <tr>
-            <td>${file.file}</td>
-            <td>${file.total}</td>
-            <td class="${file.errors > 0 ? 'error' : ''}">${file.errors}</td>
-            <td class="${file.warnings > 0 ? 'warning' : ''}">${file.warnings}</td>
+            <td>legacy_files/cli-one.mjs</td>
+            <td>25</td>
+            <td class="error">1</td>
+            <td class="warning">24</td>
           </tr>
-        `).join('')}
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/interactive.js</td>
+            <td>22</td>
+            <td class="">0</td>
+            <td class="warning">22</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/bin/cli.mjs</td>
+            <td>13</td>
+            <td class="">0</td>
+            <td class="warning">13</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/compare.js</td>
+            <td>8</td>
+            <td class="">0</td>
+            <td class="warning">8</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/track.js</td>
+            <td>8</td>
+            <td class="">0</td>
+            <td class="warning">8</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/html.js</td>
+            <td>7</td>
+            <td class="error">1</td>
+            <td class="warning">6</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/chart.js</td>
+            <td>6</td>
+            <td class="">0</td>
+            <td class="warning">6</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/fix.js</td>
+            <td>4</td>
+            <td class="">0</td>
+            <td class="warning">4</td>
+          </tr>
+        
+          <tr>
+            <td>legacy_files/setup-lint-toolbox.js</td>
+            <td>2</td>
+            <td class="">0</td>
+            <td class="warning">2</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/index.js</td>
+            <td>1</td>
+            <td class="">0</td>
+            <td class="warning">1</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/cli.js</td>
+            <td>1</td>
+            <td class="">0</td>
+            <td class="warning">1</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib/commands/theme.js</td>
+            <td>1</td>
+            <td class="">0</td>
+            <td class="warning">1</td>
+          </tr>
+        
       </tbody>
     </table>
   </div>
@@ -404,14 +355,42 @@ export const html = async (options = {}) => {
         </tr>
       </thead>
       <tbody>
-        ${jsonData.issuesByDirectory.map((dir, index) => `
+        
           <tr>
-            <td>${dir.directory}</td>
-            <td>${dir.total}</td>
-            <td class="${dir.errors > 0 ? 'error' : ''}">${dir.errors}</td>
-            <td class="${dir.warnings > 0 ? 'warning' : ''}">${dir.warnings}</td>
+            <td>src/lint-toolbox/lib/commands</td>
+            <td>56</td>
+            <td class="error">1</td>
+            <td class="warning">55</td>
           </tr>
-        `).join('')}
+        
+          <tr>
+            <td>legacy_files</td>
+            <td>27</td>
+            <td class="error">1</td>
+            <td class="warning">26</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/bin</td>
+            <td>13</td>
+            <td class="">0</td>
+            <td class="warning">13</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox</td>
+            <td>1</td>
+            <td class="">0</td>
+            <td class="warning">1</td>
+          </tr>
+        
+          <tr>
+            <td>src/lint-toolbox/lib</td>
+            <td>1</td>
+            <td class="">0</td>
+            <td class="warning">1</td>
+          </tr>
+        
       </tbody>
     </table>
   </div>
@@ -427,7 +406,7 @@ export const html = async (options = {}) => {
       });
       
       document.getElementById(tabId).classList.add('active');
-      document.querySelector(\`button[onclick="showTab('\${tabId}')"]\`).classList.add('active');
+      document.querySelector(`button[onclick="showTab('${tabId}')"]`).classList.add('active');
     }
     
     // Filter functions
@@ -520,7 +499,7 @@ export const html = async (options = {}) => {
     window.onload = function() {
       // Trend chart
       const trendCtx = document.getElementById('trendChart').getContext('2d');
-      const trendData = ${JSON.stringify(safeEntries)};
+      const trendData = [{"date":"3/1/2025, 6:12:40 PM","total":97,"errors":2,"warnings":95,"formatting":0,"files":0},{"date":"3/1/2025, 6:15:19 PM","total":98,"errors":2,"warnings":96,"formatting":0,"files":0}];
       
       new Chart(trendCtx, {
         type: 'line',
@@ -581,7 +560,7 @@ export const html = async (options = {}) => {
       
       // Rules chart
       const rulesCtx = document.getElementById('rulesChart').getContext('2d');
-      const rulesData = ${JSON.stringify(safeRuleStats.slice(0, 10))};
+      const rulesData = [{"rule":"no-unused-vars","count":40},{"rule":"no-await-in-loop","count":34},{"rule":"no-promise-executor-return","count":1},{"rule":"prefer-const","count":1},{"rule":"max-len","count":12},{"rule":"require-await","count":3},{"rule":"no-trailing-spaces","count":5},{"rule":"semi","count":1},{"rule":"comma-dangle","count":1}];
       
       new Chart(rulesCtx, {
         type: 'bar',
@@ -614,7 +593,7 @@ export const html = async (options = {}) => {
       
       // Files chart
       const filesCtx = document.getElementById('filesChart').getContext('2d');
-      const filesData = ${JSON.stringify(safeWorstFiles.slice(0, 10))};
+      const filesData = [{"file":"legacy_files/cli-one.mjs","total":25,"errors":1,"warnings":24},{"file":"src/lint-toolbox/lib/commands/interactive.js","total":22,"errors":0,"warnings":22},{"file":"src/lint-toolbox/bin/cli.mjs","total":13,"errors":0,"warnings":13},{"file":"src/lint-toolbox/lib/commands/compare.js","total":8,"errors":0,"warnings":8},{"file":"src/lint-toolbox/lib/commands/track.js","total":8,"errors":0,"warnings":8},{"file":"src/lint-toolbox/lib/commands/html.js","total":7,"errors":1,"warnings":6},{"file":"src/lint-toolbox/lib/commands/chart.js","total":6,"errors":0,"warnings":6},{"file":"src/lint-toolbox/lib/commands/fix.js","total":4,"errors":0,"warnings":4},{"file":"legacy_files/setup-lint-toolbox.js","total":2,"errors":0,"warnings":2},{"file":"src/lint-toolbox/index.js","total":1,"errors":0,"warnings":1}];
       
       new Chart(filesCtx, {
         type: 'bar',
@@ -652,7 +631,7 @@ export const html = async (options = {}) => {
       
       // Directories chart
       const dirCtx = document.getElementById('directoriesChart').getContext('2d');
-      const dirData = ${JSON.stringify(safeDirectoryIssues.slice(0, 10))};
+      const dirData = [{"directory":"src/lint-toolbox/lib/commands","errors":1,"warnings":55,"total":56},{"directory":"legacy_files","errors":1,"warnings":26,"total":27},{"directory":"src/lint-toolbox/bin","errors":0,"warnings":13,"total":13},{"directory":"src/lint-toolbox","errors":0,"warnings":1,"total":1},{"directory":"src/lint-toolbox/lib","errors":0,"warnings":1,"total":1}];
       
       new Chart(dirCtx, {
         type: 'bar',
@@ -690,20 +669,4 @@ export const html = async (options = {}) => {
     };
   </script>
 </body>
-</html>`;
-
-    // Write HTML report
-    fs.writeFileSync(htmlPath, htmlContent, 'utf8');
-
-    console.log(`${getCurrentTheme().successStyle(`HTML report generated at: ${htmlPath}`)}`);
-    console.log('Open this file in your browser to view interactive charts and statistics.');
-
-  } catch (error) {
-    console.error(`\n${getCurrentTheme().errorStyle('Error generating HTML report:')}`, error.message);
-    if (error.stack) {
-      console.error('Error location:', error.stack.split('\n')[1]);
-    }
-  }
-
-  await waitForEnter();
-}
+</html>

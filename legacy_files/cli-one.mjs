@@ -26,23 +26,23 @@ const CONFIG = {
 
 // Single and Double line characters (for future use if needed)
 const SINGLE_LINE = {
-  top_left: "┌",
-  top_right: "┐",
-  bottom_left: "└",
-  bottom_right: "┘",
-  horizontal: "─",
-  vertical: "│",
-  cross: "┼",
+  top_left: '┌',
+  top_right: '┐',
+  bottom_left: '└',
+  bottom_right: '┘',
+  horizontal: '─',
+  vertical: '│',
+  cross: '┼',
 };
 
 const DOUBLE_LINE = {
-  top_left: "╔",
-  top_right: "╗",
-  bottom_left: "╚",
-  bottom_right: "╝",
-  horizontal: "═",
-  vertical: "║",
-  cross: "╬",
+  top_left: '╔',
+  top_right: '╗',
+  bottom_left: '╚',
+  bottom_right: '╝',
+  horizontal: '═',
+  vertical: '║',
+  cross: '╬',
 };
 
 // Themes and current theme selection
@@ -55,7 +55,7 @@ const themes = {
     errorStyle: chalk.bold.red,
     warningStyle: chalk.bold.yellow,
     infoStyle: chalk.bold.blue,
-    successStyle: chalk.bold.green
+    successStyle: chalk.bold.green,
   },
   dark: {
     borderStyle: chalk.bold.white,
@@ -65,7 +65,7 @@ const themes = {
     errorStyle: chalk.bold.red,
     warningStyle: chalk.bold.yellow,
     infoStyle: chalk.bold.cyan,
-    successStyle: chalk.bold.green
+    successStyle: chalk.bold.green,
   },
   light: {
     borderStyle: chalk.bold.black,
@@ -75,141 +75,141 @@ const themes = {
     errorStyle: chalk.bold.red,
     warningStyle: chalk.bold.yellow,
     infoStyle: chalk.bold.blue,
-    successStyle: chalk.bold.green
-  }
+    successStyle: chalk.bold.green,
+  },
 };
-let currentTheme = "default";
+let currentTheme = 'default';
 
 // -----------------------------------------------------------------------------
 // Main Menu & Program Entry Point
 // -----------------------------------------------------------------------------
 
 async function main() {
-    while (true) {
-      console.clear();
-      displayHeader();
-      displayAsciiMenu();
-  
-      const { choice } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'choice',
-          message: 'Enter your choice:',
-          choices: ['1', '2', '3', '4', '5', '6', '0']
-        }
-      ]);
-  
-      if (choice === '1') {
-        await trackLintingProgress();
-      } else if (choice === '2') {
-        await viewProgressChart();
-      } else if (choice === '3') {
-        await generateHtmlReport();
-      } else if (choice === '4') {
-        await fixEslintRule();
-      } else if (choice === '5') {
-        await compareLintingVersions();
-      } else if (choice === '6') {
-        await changeTheme();
-      } else if (choice === '0') {
-        console.log(themes[currentTheme].errorStyle("Exiting. Goodbye!"));
-        break;
-      } else {
-        console.log(themes[currentTheme].errorStyle("Invalid option. Please try again."));
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
-  }
-  
-  // Start the program
-  main();
-  
-  // -----------------------------------------------------------------------------
-  // Helper Functions
-  // -----------------------------------------------------------------------------
-  
-  // Wait for user input (simulate "Press Enter to continue")
-  async function waitForEnter(message = 'Press Enter to return to the main menu') {
-    await inquirer.prompt([{ type: 'input', name: 'dummy', message }]);
-  }
-  
-  // Center text in a fixed width
-  function centerText(text, width) {
-    const len = text.length;
-    if (len >= width) return text;
-    const leftPadding = Math.floor((width - len) / 2);
-    const rightPadding = width - len - leftPadding;
-    return " ".repeat(leftPadding) + text + " ".repeat(rightPadding);
-  }
-  
-  // Pad text to the right in a fixed width
-  function padRight(text, width) {
-    if (text.length >= width) return text;
-    return text + " ".repeat(width - text.length);
-  }
-  
-  // Simple progress bar function
-  function updateProgressBar(current, total, message = '', barLength = 30) {
-    const progress = Math.min(100, Math.round((current / total) * 100));
-    const filledLength = Math.min(barLength, Math.round((current / total) * barLength));
-    const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
-  
-    process.stdout.write(`\r[${bar}] ${progress}% | ${message}`);
-  
-    if (current === total) {
-      process.stdout.write('\n');
-    }
-  }
-  
-  // Safely execute commands
-  function safeExec(command, progressMessage = 'Processing') {
-    console.log(`${progressMessage}...`);
-  
-    try {
-      // Show a simple spinner while the command is running
-      let spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-      let frameIndex = 0;
-      let spinnerInterval;
-  
-      spinnerInterval = setInterval(() => {
-        process.stdout.write(`\r${spinnerFrames[frameIndex]} ${progressMessage}...`);
-        frameIndex = (frameIndex + 1) % spinnerFrames.length;
-      }, 80);
-  
-      const result = execSync(command, {
-        encoding: 'utf8',
-        maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-      });
-  
-      clearInterval(spinnerInterval);
-      process.stdout.write(`\r✓ ${progressMessage} ${chalk.green('completed')}    \n`);
-  
-      return result;
-    } catch (error) {
-      // If the command fails but outputs something, return that output
-      if (error.stdout) {
-        return error.stdout;
-      }
-      throw error;
-    }
-  }
-  
-  // Ensure directory exists
-  function ensureDirectoryExists(dirPath) {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-      console.log(chalk.green(`Created directory: ${dirPath}`));
-    }
-  }
-  
-  // -----------------------------------------------------------------------------
-  // Display Functions
-  // -----------------------------------------------------------------------------
-  
-  // Display header with logo, system info, and greeting
-  function displayHeader() {
+  while (true) {
     console.clear();
-    const logo = `
+    displayHeader();
+    displayAsciiMenu();
+
+    const { choice } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'choice',
+        message: 'Enter your choice:',
+        choices: ['1', '2', '3', '4', '5', '6', '0'],
+      },
+    ]);
+
+    if (choice === '1') {
+      await trackLintingProgress();
+    } else if (choice === '2') {
+      await viewProgressChart();
+    } else if (choice === '3') {
+      await generateHtmlReport();
+    } else if (choice === '4') {
+      await fixEslintRule();
+    } else if (choice === '5') {
+      await compareLintingVersions();
+    } else if (choice === '6') {
+      await changeTheme();
+    } else if (choice === '0') {
+      console.log(themes[currentTheme].errorStyle('Exiting. Goodbye!'));
+      break;
+    } else {
+      console.log(themes[currentTheme].errorStyle('Invalid option. Please try again.'));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+}
+
+// Start the program
+main();
+
+// -----------------------------------------------------------------------------
+// Helper Functions
+// -----------------------------------------------------------------------------
+
+// Wait for user input (simulate "Press Enter to continue")
+async function waitForEnter(message = 'Press Enter to return to the main menu') {
+  await inquirer.prompt([{ type: 'input', name: 'dummy', message }]);
+}
+
+// Center text in a fixed width
+function centerText(text, width) {
+  const len = text.length;
+  if (len >= width) return text;
+  const leftPadding = Math.floor((width - len) / 2);
+  const rightPadding = width - len - leftPadding;
+  return ' '.repeat(leftPadding) + text + ' '.repeat(rightPadding);
+}
+
+// Pad text to the right in a fixed width
+function padRight(text, width) {
+  if (text.length >= width) return text;
+  return text + ' '.repeat(width - text.length);
+}
+
+// Simple progress bar function
+function updateProgressBar(current, total, message = '', barLength = 30) {
+  const progress = Math.min(100, Math.round((current / total) * 100));
+  const filledLength = Math.min(barLength, Math.round((current / total) * barLength));
+  const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
+
+  process.stdout.write(`\r[${bar}] ${progress}% | ${message}`);
+
+  if (current === total) {
+    process.stdout.write('\n');
+  }
+}
+
+// Safely execute commands
+function safeExec(command, progressMessage = 'Processing') {
+  console.log(`${progressMessage}...`);
+
+  try {
+    // Show a simple spinner while the command is running
+    const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    let frameIndex = 0;
+    let spinnerInterval;
+
+    spinnerInterval = setInterval(() => {
+      process.stdout.write(`\r${spinnerFrames[frameIndex]} ${progressMessage}...`);
+      frameIndex = (frameIndex + 1) % spinnerFrames.length;
+    }, 80);
+
+    const result = execSync(command, {
+      encoding: 'utf8',
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+    });
+
+    clearInterval(spinnerInterval);
+    process.stdout.write(`\r✓ ${progressMessage} ${chalk.green('completed')}    \n`);
+
+    return result;
+  } catch (error) {
+    // If the command fails but outputs something, return that output
+    if (error.stdout) {
+      return error.stdout;
+    }
+    throw error;
+  }
+}
+
+// Ensure directory exists
+function ensureDirectoryExists(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+    console.log(chalk.green(`Created directory: ${dirPath}`));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Display Functions
+// -----------------------------------------------------------------------------
+
+// Display header with logo, system info, and greeting
+function displayHeader() {
+  console.clear();
+  const logo = `
 ▗▖  ▗▖▄ █ █  ▄ ▗▄▄▖ ▗▞▀▜▌   
 ▐▛▚▞▜▌▄ █ █▄▀  ▐▌ ▐▌▝▚▄▟▌   
 ▐▌  ▐▌█ █ █ ▀▄ ▐▛▀▚▖        
@@ -218,366 +218,366 @@ async function main() {
                         ▝▀▜▌
                        ▐▙▄▞▘
   `;
-    console.log(chalk.bold.blue(logo));
-    console.log(chalk.bold.cyan(`System: ${process.platform} | Node: ${process.version}`));
-    console.log(chalk.bold.green("TypeScript Linting Toolbox - Your complete solution for tracking and improving code quality"));
+  console.log(chalk.bold.blue(logo));
+  console.log(chalk.bold.cyan(`System: ${process.platform} | Node: ${process.version}`));
+  console.log(chalk.bold.green('TypeScript Linting Toolbox - Your complete solution for tracking and improving code quality'));
+}
+
+// This function displays the ASCII CLI menu
+function displayAsciiMenu() {
+  const indent = '          '; // 10 spaces
+  const leftColWidth = 8;
+  const rightColWidth = 49;
+  const theme = themes[currentTheme];
+
+  const topBorder = theme.borderStyle(indent + '┏' + '━'.repeat(leftColWidth) + '┳' + '━'.repeat(rightColWidth) + '┓');
+  const headerRow = theme.borderStyle(indent + '┃') + centerText('Option', leftColWidth) + theme.borderStyle('┃') + padRight('Description', rightColWidth) + theme.borderStyle('┃');
+  const headerSep = theme.borderStyle(indent + '┡' + '━'.repeat(leftColWidth) + '╇' + '━'.repeat(rightColWidth) + '┩');
+
+  const menuItems = [
+    { option: '1', description: 'Run Linting Analysis' },
+    { option: '2', description: 'View Progress & Statistics' },
+    { option: '3', description: 'Generate HTML Report' },
+    { option: '4', description: 'Fix Specific ESLint Rule' },
+    { option: '5', description: 'Compare with Previous Version' },
+    { option: '6', description: 'Change Theme' },
+    { option: '0', description: 'Exit' },
+  ];
+
+  let rows = '';
+  for (const item of menuItems) {
+    rows += theme.borderStyle(indent + '│') + centerText(item.option, leftColWidth) + theme.borderStyle('│') + padRight(item.description, rightColWidth) + theme.borderStyle('│\n');
   }
-  
-  // This function displays the ASCII CLI menu
-  function displayAsciiMenu() {
-    const indent = "          "; // 10 spaces
-    const leftColWidth = 8;
-    const rightColWidth = 49;
-    const theme = themes[currentTheme];
-  
-    const topBorder = theme.borderStyle(indent + "┏" + "━".repeat(leftColWidth) + "┳" + "━".repeat(rightColWidth) + "┓");
-    const headerRow = theme.borderStyle(indent + "┃") + centerText("Option", leftColWidth) + theme.borderStyle("┃") + padRight("Description", rightColWidth) + theme.borderStyle("┃");
-    const headerSep = theme.borderStyle(indent + "┡" + "━".repeat(leftColWidth) + "╇" + "━".repeat(rightColWidth) + "┩");
-  
-    const menuItems = [
-      { option: "1", description: "Run Linting Analysis" },
-      { option: "2", description: "View Progress & Statistics" },
-      { option: "3", description: "Generate HTML Report" },
-      { option: "4", description: "Fix Specific ESLint Rule" },
-      { option: "5", description: "Compare with Previous Version" },
-      { option: "6", description: "Change Theme" },
-      { option: "0", description: "Exit" }
-    ];
-  
-    let rows = "";
-    for (const item of menuItems) {
-      rows += theme.borderStyle(indent + "│") + centerText(item.option, leftColWidth) + theme.borderStyle("│") + padRight(item.description, rightColWidth) + theme.borderStyle("│\n");
-    }
-  
-    const bottomBorder = theme.borderStyle(indent + "└" + "─".repeat(leftColWidth) + "┴" + "─".repeat(rightColWidth) + "┘");
-  
-    // Print header and menu
-    console.log(topBorder);
-    console.log(headerRow);
-    console.log(headerSep);
-    console.log(rows.trimEnd());
-    console.log(bottomBorder);
-  }
-  
-  // -----------------------------------------------------------------------------
-  // Core Linting Functions
-  // -----------------------------------------------------------------------------
-  
-  // Track current linting status
-  async function trackLintingProgress() {
-    console.clear();
-    displayHeader();
-    console.log("\n" + themes[currentTheme].titleStyle("✓ Running Linting Analysis"));
-  
-    try {
-      // Set a timeout to prevent hanging
-      const timeoutId = setTimeout(() => {
-        console.error(
-          `\n\n${themes[currentTheme].errorStyle("Script execution timed out after " + CONFIG.timeout / 1000 + " seconds")}`
-        );
-        console.error('This may indicate an issue with ESLint or Prettier processing');
-        return;
-      }, CONFIG.timeout);
-  
-      // Get current date
-      const date = new Date().toISOString().split('T')[0];
-      const dateEntry = `===== ${date} =====`;
-  
-      // Ensure the log file exists
-      ensureDirectoryExists(path.dirname(CONFIG.logFile));
-      if (!fs.existsSync(CONFIG.logFile)) {
-        fs.writeFileSync(CONFIG.logFile, '', 'utf8');
-        console.log(themes[currentTheme].successStyle(`Created new log file: ${CONFIG.logFile}`));
-      }
-  
-      let logContent = `${dateEntry}\n`;
-      let totalIssues = 0;
-      let eslintErrors = 0;
-      let eslintWarnings = 0;
-      let prettierIssues = 0;
-  
-      // Build the ESLint command with file patterns and ignores
-      const eslintCmd = `npx eslint ${CONFIG.fileGlobs} --format json --max-warnings=9999`;
-  
-      // Run ESLint check
-      const eslintOutput = safeExec(eslintCmd, 'Running ESLint check');
-  
-      // Parse ESLint results
-      let eslintData = [];
-      try {
-        console.log('Parsing ESLint results...');
-        eslintData = JSON.parse(eslintOutput);
-        console.log(
-          themes[currentTheme].successStyle(`Successfully parsed results for ${eslintData.length} files`)
-        );
-      } catch (error) {
-        console.warn(
-          themes[currentTheme].warningStyle("Warning: Could not parse ESLint output as JSON. ESLint may not be properly configured.")
-        );
-        console.warn(`Error details: ${error.message}`);
-        console.warn('Proceeding with zero ESLint issues...');
-      }
-  
-      // Count errors and warnings with progress bar
-      const issuesByRule = {};
-      const issuesByFile = {};
-      const issuesByDirectory = {};
-  
-      if (eslintData.length > 0) {
-        console.log('Analyzing ESLint issues:');
-  
-        eslintData.forEach((file, index) => {
-          updateProgressBar(
-            index + 1,
-            eslintData.length,
-            `Analyzing file ${index + 1}/${eslintData.length}`
-          );
-  
-          // Extract directory information from file path
-          const relativePath = path.relative(process.cwd(), file.filePath);
-          const directory = path.dirname(relativePath);
-          
-          if (!issuesByDirectory[directory]) {
-            issuesByDirectory[directory] = { errors: 0, warnings: 0, total: 0 };
-          }
-  
-          if (file.messages && file.messages.length > 0) {
-            // Track issues by file
-            issuesByFile[file.filePath] = {
-              errors: file.messages.filter(msg => msg.severity === 2).length,
-              warnings: file.messages.filter(msg => msg.severity === 1).length,
-              total: file.messages.length
-            };
-            
-            // Update directory stats
-            issuesByDirectory[directory].errors += issuesByFile[file.filePath].errors;
-            issuesByDirectory[directory].warnings += issuesByFile[file.filePath].warnings;
-            issuesByDirectory[directory].total += issuesByFile[file.filePath].total;
-  
-            file.messages.forEach(msg => {
-              if (msg.severity === 2) {
-                eslintErrors++;
-              } else if (msg.severity === 1) {
-                eslintWarnings++;
-              }
-  
-              // Track issues by rule
-              const ruleId = msg.ruleId || 'unknown';
-              if (!issuesByRule[ruleId]) {
-                issuesByRule[ruleId] = { count: 0, errors: 0, warnings: 0 };
-              }
-              issuesByRule[ruleId].count++;
-              if (msg.severity === 2) {
-                issuesByRule[ruleId].errors++;
-              } else if (msg.severity === 1) {
-                issuesByRule[ruleId].warnings++;
-              }
-            });
-          }
-        });
-      }
-  
-      // Check Prettier formatting issues if enabled
-      if (CONFIG.checkPrettier) {
-        try {
-          const prettierCmd = `npx prettier --check ${CONFIG.fileGlobs} | wc -l`;
-          const prettierOutput = safeExec(prettierCmd, 'Running Prettier check').trim();
-  
-          // Parse Prettier output - this is an approximation as Prettier doesn't have a strict format
-          const prettierCount = parseInt(prettierOutput, 10);
-          if (!isNaN(prettierCount) && prettierCount > 0) {
-            // Usually Prettier prints a header line, so we subtract 1
-            prettierIssues = Math.max(0, prettierCount - 1);
-            console.log(
-              themes[currentTheme].infoStyle(`Found ${prettierIssues} Prettier formatting issues`)
-            );
-          } else {
-            console.log(themes[currentTheme].successStyle(`No Prettier formatting issues found`));
-          }
-        } catch (error) {
-          console.warn(
-            themes[currentTheme].warningStyle("Warning: Could not run Prettier check. Prettier may not be installed.")
-          );
-          console.warn(`Error details: ${error.message}`);
-          console.warn('Proceeding with zero Prettier issues...');
-        }
-      }
-  
-      // Calculate totals
-      totalIssues = eslintErrors + eslintWarnings + prettierIssues;
-  
-      // Format the progress entry for the log file
-      const progressEntry = `${totalIssues} problems (${eslintErrors} errors, ${eslintWarnings} warnings${CONFIG.checkPrettier ? `, ${prettierIssues} formatting` : ''})`;
-  
-      logContent += `${progressEntry}\n`;
-  
-      // Add details about top issues
-      const sortedIssues = Object.entries(issuesByRule)
-        .sort((a, b) => b[1].count - a[1].count)
-        .slice(0, 10);
-      
-      if (sortedIssues.length > 0) {
-        logContent += '\nTop issues by rule:\n';
-        sortedIssues.forEach(([rule, data]) => {
-          logContent += `- ${rule}: ${data.count} occurrences (${data.errors} errors, ${data.warnings} warnings)\n`;
-        });
-  
-        // Add a suggestion for fixing the top issue
-        const [topRule, topData] = sortedIssues[0];
-        if (topRule && topRule !== 'unknown') {
-          logContent += `\nSuggestion: Focus on fixing "${topRule}" issues (${topData.count} occurrences)\n`;
-  
-          if (topRule.startsWith('prettier/') || topRule === 'prettier') {
-            logContent += `Try running: npx prettier --write ${CONFIG.fileGlobs}\n`;
-          } else {
-            logContent += `Try running: npx eslint --fix . --rule "${topRule}: error"\n`;
-          }
-        }
-      }
-  
-      logContent += '\n';
-  
-      // Write to log file
-      fs.appendFileSync(CONFIG.logFile, logContent, 'utf8');
-      console.log(`\n${themes[currentTheme].successStyle(`Progress entry added to ${CONFIG.logFile}`)}`);
-  
-      // Store detailed data for reports
-      const lintData = {
-        date,
-        summary: {
-          total: totalIssues,
-          errors: eslintErrors,
-          warnings: eslintWarnings,
-          formatting: prettierIssues
-        },
-        issuesByRule: Object.entries(issuesByRule)
-          .map(([rule, data]) => ({ 
-            rule, 
-            count: data.count, 
-            errors: data.errors, 
-            warnings: data.warnings 
-          }))
-          .sort((a, b) => b.count - a.count),
-        issuesByDirectory: Object.entries(issuesByDirectory)
-          .map(([dir, data]) => ({ 
-            directory: dir, 
-            errors: data.errors, 
-            warnings: data.warnings, 
-            total: data.total 
-          }))
-          .sort((a, b) => b.total - a.total),
-        worstFiles: Object.entries(issuesByFile)
-          .map(([file, data]) => ({
-            file: path.relative(process.cwd(), file),
-            errors: data.errors,
-            warnings: data.warnings,
-            total: data.total
-          }))
-          .sort((a, b) => b.total - a.total)
-          .slice(0, 20)
-      };
-  
-      // Ensure reports directory exists
-      ensureDirectoryExists(CONFIG.reportDir);
-      
-      // Save data for reports
-      fs.writeFileSync(
-        path.join(CONFIG.reportDir, CONFIG.jsonFilename),
-        JSON.stringify(lintData, null, 2),
-        'utf8'
+
+  const bottomBorder = theme.borderStyle(indent + '└' + '─'.repeat(leftColWidth) + '┴' + '─'.repeat(rightColWidth) + '┘');
+
+  // Print header and menu
+  console.log(topBorder);
+  console.log(headerRow);
+  console.log(headerSep);
+  console.log(rows.trimEnd());
+  console.log(bottomBorder);
+}
+
+// -----------------------------------------------------------------------------
+// Core Linting Functions
+// -----------------------------------------------------------------------------
+
+// Track current linting status
+async function trackLintingProgress() {
+  console.clear();
+  displayHeader();
+  console.log('\n' + themes[currentTheme].titleStyle('✓ Running Linting Analysis'));
+
+  try {
+    // Set a timeout to prevent hanging
+    const timeoutId = setTimeout(() => {
+      console.error(
+        `\n\n${themes[currentTheme].errorStyle('Script execution timed out after ' + CONFIG.timeout / 1000 + ' seconds')}`,
       );
-  
-      // Display summary
-      console.log(`\n${themes[currentTheme].titleStyle("Summary:")}`);
-      console.log(`${themes[currentTheme].errorStyle(`ESLint errors: ${eslintErrors}`)}`);
-      console.log(`${themes[currentTheme].warningStyle(`ESLint warnings: ${eslintWarnings}`)}`);
-      if (CONFIG.checkPrettier) {
-        console.log(`${themes[currentTheme].infoStyle(`Prettier issues: ${prettierIssues}`)}`);
-      }
-      console.log(`${themes[currentTheme].titleStyle(`Total issues: ${totalIssues}`)}`);
-  
-      // Display top issues
-      if (sortedIssues.length > 0) {
-        console.log(`\n${themes[currentTheme].titleStyle("Top Issues by Rule:")}`);
-        sortedIssues.slice(0, 5).forEach(([rule, data], index) => {
-          console.log(`${index + 1}. ${rule}: ${data.count} occurrences (${data.errors} errors, ${data.warnings} warnings)`);
-        });
-      }
-  
-      // Display worst directories
-      const worstDirectories = Object.entries(issuesByDirectory)
-        .sort((a, b) => b[1].total - a[1].total)
-        .slice(0, 5);
-      
-      if (worstDirectories.length > 0) {
-        console.log(`\n${themes[currentTheme].titleStyle("Worst Directories:")}`);
-        worstDirectories.forEach(([dir, data], index) => {
-          console.log(`${index + 1}. ${dir}: ${data.total} issues (${data.errors} errors, ${data.warnings} warnings)`);
-        });
-      }
-  
-      // Clear the timeout since we're done
-      clearTimeout(timeoutId);
-    } catch (error) {
-      console.error(`\n${themes[currentTheme].errorStyle("Error tracking ESLint progress:")}`, error.message);
-      if (error.stack) {
-        console.error(`\n${themes[currentTheme].warningStyle("Stack trace:")}\n${error.stack}`);
-      }
+      console.error('This may indicate an issue with ESLint or Prettier processing');
+      return;
+    }, CONFIG.timeout);
+
+    // Get current date
+    const date = new Date().toISOString().split('T')[0];
+    const dateEntry = `===== ${date} =====`;
+
+    // Ensure the log file exists
+    ensureDirectoryExists(path.dirname(CONFIG.logFile));
+    if (!fs.existsSync(CONFIG.logFile)) {
+      fs.writeFileSync(CONFIG.logFile, '', 'utf8');
+      console.log(themes[currentTheme].successStyle(`Created new log file: ${CONFIG.logFile}`));
     }
-  
-    await waitForEnter();
-  }
-  
-  // Generate HTML report
-  async function generateHtmlReport() {
-    console.clear();
-    displayHeader();
-    console.log("\n" + themes[currentTheme].titleStyle("✓ Generating HTML Report"));
-    
+
+    let logContent = `${dateEntry}\n`;
+    let totalIssues = 0;
+    let eslintErrors = 0;
+    let eslintWarnings = 0;
+    let prettierIssues = 0;
+
+    // Build the ESLint command with file patterns and ignores
+    const eslintCmd = `npx eslint ${CONFIG.fileGlobs} --format json --max-warnings=9999`;
+
+    // Run ESLint check
+    const eslintOutput = safeExec(eslintCmd, 'Running ESLint check');
+
+    // Parse ESLint results
+    let eslintData = [];
     try {
-      // Check if JSON data exists
-      const jsonPath = path.join(CONFIG.reportDir, CONFIG.jsonFilename);
-      if (!fs.existsSync(jsonPath)) {
-        console.log(`${themes[currentTheme].warningStyle('No data available. Please run linting analysis first.')}`);
-        await waitForEnter();
-        return;
-      }
-      
-      // Read the JSON data
-      const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-      
-      // Create the HTML report
-      const htmlPath = path.join(CONFIG.reportDir, CONFIG.reportFilename);
-      const chartJsScript = '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>';
-      
-      // Get historical data from log file
-      const logContent = fs.readFileSync(CONFIG.logFile, 'utf8');
-      const logLines = logContent.split('\n').filter(line => line.trim());
-      
-      const historyEntries = [];
-      let currentDate = '';
-      
-      logLines.forEach(line => {
-        if (line.startsWith('===== ')) {
-          currentDate = line.replace(/=+/g, '').trim();
-        } else if (line.includes('problems')) {
-          const match = line.match(
-            /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/
-          );
-          if (match) {
-            historyEntries.push({
-              date: currentDate,
-              total: parseInt(match[1], 10),
-              errors: parseInt(match[2], 10),
-              warnings: parseInt(match[3], 10),
-              formatting: match[4] ? parseInt(match[4], 10) : 0,
-            });
-          }
+      console.log('Parsing ESLint results...');
+      eslintData = JSON.parse(eslintOutput);
+      console.log(
+        themes[currentTheme].successStyle(`Successfully parsed results for ${eslintData.length} files`),
+      );
+    } catch (error) {
+      console.warn(
+        themes[currentTheme].warningStyle('Warning: Could not parse ESLint output as JSON. ESLint may not be properly configured.'),
+      );
+      console.warn(`Error details: ${error.message}`);
+      console.warn('Proceeding with zero ESLint issues...');
+    }
+
+    // Count errors and warnings with progress bar
+    const issuesByRule = {};
+    const issuesByFile = {};
+    const issuesByDirectory = {};
+
+    if (eslintData.length > 0) {
+      console.log('Analyzing ESLint issues:');
+
+      eslintData.forEach((file, index) => {
+        updateProgressBar(
+          index + 1,
+          eslintData.length,
+          `Analyzing file ${index + 1}/${eslintData.length}`,
+        );
+
+        // Extract directory information from file path
+        const relativePath = path.relative(process.cwd(), file.filePath);
+        const directory = path.dirname(relativePath);
+
+        if (!issuesByDirectory[directory]) {
+          issuesByDirectory[directory] = { errors: 0, warnings: 0, total: 0 };
+        }
+
+        if (file.messages && file.messages.length > 0) {
+          // Track issues by file
+          issuesByFile[file.filePath] = {
+            errors: file.messages.filter((msg) => msg.severity === 2).length,
+            warnings: file.messages.filter((msg) => msg.severity === 1).length,
+            total: file.messages.length,
+          };
+
+          // Update directory stats
+          issuesByDirectory[directory].errors += issuesByFile[file.filePath].errors;
+          issuesByDirectory[directory].warnings += issuesByFile[file.filePath].warnings;
+          issuesByDirectory[directory].total += issuesByFile[file.filePath].total;
+
+          file.messages.forEach((msg) => {
+            if (msg.severity === 2) {
+              eslintErrors++;
+            } else if (msg.severity === 1) {
+              eslintWarnings++;
+            }
+
+            // Track issues by rule
+            const ruleId = msg.ruleId || 'unknown';
+            if (!issuesByRule[ruleId]) {
+              issuesByRule[ruleId] = { count: 0, errors: 0, warnings: 0 };
+            }
+            issuesByRule[ruleId].count++;
+            if (msg.severity === 2) {
+              issuesByRule[ruleId].errors++;
+            } else if (msg.severity === 1) {
+              issuesByRule[ruleId].warnings++;
+            }
+          });
         }
       });
-      
-      // Create HTML content
-      const htmlContent = `
+    }
+
+    // Check Prettier formatting issues if enabled
+    if (CONFIG.checkPrettier) {
+      try {
+        const prettierCmd = `npx prettier --check ${CONFIG.fileGlobs} | wc -l`;
+        const prettierOutput = safeExec(prettierCmd, 'Running Prettier check').trim();
+
+        // Parse Prettier output - this is an approximation as Prettier doesn't have a strict format
+        const prettierCount = parseInt(prettierOutput, 10);
+        if (!isNaN(prettierCount) && prettierCount > 0) {
+          // Usually Prettier prints a header line, so we subtract 1
+          prettierIssues = Math.max(0, prettierCount - 1);
+          console.log(
+            themes[currentTheme].infoStyle(`Found ${prettierIssues} Prettier formatting issues`),
+          );
+        } else {
+          console.log(themes[currentTheme].successStyle('No Prettier formatting issues found'));
+        }
+      } catch (error) {
+        console.warn(
+          themes[currentTheme].warningStyle('Warning: Could not run Prettier check. Prettier may not be installed.'),
+        );
+        console.warn(`Error details: ${error.message}`);
+        console.warn('Proceeding with zero Prettier issues...');
+      }
+    }
+
+    // Calculate totals
+    totalIssues = eslintErrors + eslintWarnings + prettierIssues;
+
+    // Format the progress entry for the log file
+    const progressEntry = `${totalIssues} problems (${eslintErrors} errors, ${eslintWarnings} warnings${CONFIG.checkPrettier ? `, ${prettierIssues} formatting` : ''})`;
+
+    logContent += `${progressEntry}\n`;
+
+    // Add details about top issues
+    const sortedIssues = Object.entries(issuesByRule)
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 10);
+
+    if (sortedIssues.length > 0) {
+      logContent += '\nTop issues by rule:\n';
+      sortedIssues.forEach(([rule, data]) => {
+        logContent += `- ${rule}: ${data.count} occurrences (${data.errors} errors, ${data.warnings} warnings)\n`;
+      });
+
+      // Add a suggestion for fixing the top issue
+      const [topRule, topData] = sortedIssues[0];
+      if (topRule && topRule !== 'unknown') {
+        logContent += `\nSuggestion: Focus on fixing "${topRule}" issues (${topData.count} occurrences)\n`;
+
+        if (topRule.startsWith('prettier/') || topRule === 'prettier') {
+          logContent += `Try running: npx prettier --write ${CONFIG.fileGlobs}\n`;
+        } else {
+          logContent += `Try running: npx eslint --fix . --rule "${topRule}: error"\n`;
+        }
+      }
+    }
+
+    logContent += '\n';
+
+    // Write to log file
+    fs.appendFileSync(CONFIG.logFile, logContent, 'utf8');
+    console.log(`\n${themes[currentTheme].successStyle(`Progress entry added to ${CONFIG.logFile}`)}`);
+
+    // Store detailed data for reports
+    const lintData = {
+      date,
+      summary: {
+        total: totalIssues,
+        errors: eslintErrors,
+        warnings: eslintWarnings,
+        formatting: prettierIssues,
+      },
+      issuesByRule: Object.entries(issuesByRule)
+        .map(([rule, data]) => ({
+          rule,
+          count: data.count,
+          errors: data.errors,
+          warnings: data.warnings,
+        }))
+        .sort((a, b) => b.count - a.count),
+      issuesByDirectory: Object.entries(issuesByDirectory)
+        .map(([dir, data]) => ({
+          directory: dir,
+          errors: data.errors,
+          warnings: data.warnings,
+          total: data.total,
+        }))
+        .sort((a, b) => b.total - a.total),
+      worstFiles: Object.entries(issuesByFile)
+        .map(([file, data]) => ({
+          file: path.relative(process.cwd(), file),
+          errors: data.errors,
+          warnings: data.warnings,
+          total: data.total,
+        }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 20),
+    };
+
+    // Ensure reports directory exists
+    ensureDirectoryExists(CONFIG.reportDir);
+
+    // Save data for reports
+    fs.writeFileSync(
+      path.join(CONFIG.reportDir, CONFIG.jsonFilename),
+      JSON.stringify(lintData, null, 2),
+      'utf8',
+    );
+
+    // Display summary
+    console.log(`\n${themes[currentTheme].titleStyle('Summary:')}`);
+    console.log(`${themes[currentTheme].errorStyle(`ESLint errors: ${eslintErrors}`)}`);
+    console.log(`${themes[currentTheme].warningStyle(`ESLint warnings: ${eslintWarnings}`)}`);
+    if (CONFIG.checkPrettier) {
+      console.log(`${themes[currentTheme].infoStyle(`Prettier issues: ${prettierIssues}`)}`);
+    }
+    console.log(`${themes[currentTheme].titleStyle(`Total issues: ${totalIssues}`)}`);
+
+    // Display top issues
+    if (sortedIssues.length > 0) {
+      console.log(`\n${themes[currentTheme].titleStyle('Top Issues by Rule:')}`);
+      sortedIssues.slice(0, 5).forEach(([rule, data], index) => {
+        console.log(`${index + 1}. ${rule}: ${data.count} occurrences (${data.errors} errors, ${data.warnings} warnings)`);
+      });
+    }
+
+    // Display worst directories
+    const worstDirectories = Object.entries(issuesByDirectory)
+      .sort((a, b) => b[1].total - a[1].total)
+      .slice(0, 5);
+
+    if (worstDirectories.length > 0) {
+      console.log(`\n${themes[currentTheme].titleStyle('Worst Directories:')}`);
+      worstDirectories.forEach(([dir, data], index) => {
+        console.log(`${index + 1}. ${dir}: ${data.total} issues (${data.errors} errors, ${data.warnings} warnings)`);
+      });
+    }
+
+    // Clear the timeout since we're done
+    clearTimeout(timeoutId);
+  } catch (error) {
+    console.error(`\n${themes[currentTheme].errorStyle('Error tracking ESLint progress:')}`, error.message);
+    if (error.stack) {
+      console.error(`\n${themes[currentTheme].warningStyle('Stack trace:')}\n${error.stack}`);
+    }
+  }
+
+  await waitForEnter();
+}
+
+// Generate HTML report
+async function generateHtmlReport() {
+  console.clear();
+  displayHeader();
+  console.log('\n' + themes[currentTheme].titleStyle('✓ Generating HTML Report'));
+
+  try {
+    // Check if JSON data exists
+    const jsonPath = path.join(CONFIG.reportDir, CONFIG.jsonFilename);
+    if (!fs.existsSync(jsonPath)) {
+      console.log(`${themes[currentTheme].warningStyle('No data available. Please run linting analysis first.')}`);
+      await waitForEnter();
+      return;
+    }
+
+    // Read the JSON data
+    const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+    // Create the HTML report
+    const htmlPath = path.join(CONFIG.reportDir, CONFIG.reportFilename);
+    const chartJsScript = '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>';
+
+    // Get historical data from log file
+    const logContent = fs.readFileSync(CONFIG.logFile, 'utf8');
+    const logLines = logContent.split('\n').filter((line) => line.trim());
+
+    const historyEntries = [];
+    let currentDate = '';
+
+    logLines.forEach((line) => {
+      if (line.startsWith('===== ')) {
+        currentDate = line.replace(/=+/g, '').trim();
+      } else if (line.includes('problems')) {
+        const match = line.match(
+          /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/,
+        );
+        if (match) {
+          historyEntries.push({
+            date: currentDate,
+            total: parseInt(match[1], 10),
+            errors: parseInt(match[2], 10),
+            warnings: parseInt(match[3], 10),
+            formatting: match[4] ? parseInt(match[4], 10) : 0,
+          });
+        }
+      }
+    });
+
+    // Create HTML content
+    const htmlContent = `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -1057,13 +1057,13 @@ async function main() {
       window.onload = function() {
         // Trend chart
         const trendCtx = document.getElementById('trendChart').getContext('2d');
-        const trendData = ${JSON.stringify(historyEntries.map(entry => ({
-          date: entry.date,
-          total: entry.total,
-          errors: entry.errors,
-          warnings: entry.warnings,
-          formatting: entry.formatting || 0
-        })))};
+        const trendData = ${JSON.stringify(historyEntries.map((entry) => ({
+    date: entry.date,
+    total: entry.total,
+    errors: entry.errors,
+    warnings: entry.warnings,
+    formatting: entry.formatting || 0,
+  })))};
         
         new Chart(trendCtx, {
           type: 'line',
@@ -1246,587 +1246,585 @@ async function main() {
   </body>
   </html>
       `;
-      
-      // Write HTML report
-      fs.writeFileSync(htmlPath, htmlContent, 'utf8');
-      
-      console.log(`${themes[currentTheme].successStyle(`HTML report generated at: ${htmlPath}`)}`);
-      console.log(`Open this file in your browser to view interactive charts and statistics.`);
-      
-    } catch (error) {
-      console.error(`\n${themes[currentTheme].errorStyle("Error generating HTML report:")}`, error.message);
-    }
-    
-    await waitForEnter();
+
+    // Write HTML report
+    fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+
+    console.log(`${themes[currentTheme].successStyle(`HTML report generated at: ${htmlPath}`)}`);
+    console.log('Open this file in your browser to view interactive charts and statistics.');
+
+  } catch (error) {
+    console.error(`\n${themes[currentTheme].errorStyle('Error generating HTML report:')}`, error.message);
   }
-  
-  // Fix specific ESLint rule
-  async function fixEslintRule() {
-    console.clear();
-    displayHeader();
-    console.log("\n" + themes[currentTheme].titleStyle("✓ Fix Specific ESLint Rule"));
-    
+
+  await waitForEnter();
+}
+
+// Fix specific ESLint rule
+async function fixEslintRule() {
+  console.clear();
+  displayHeader();
+  console.log('\n' + themes[currentTheme].titleStyle('✓ Fix Specific ESLint Rule'));
+
+  try {
+    // Get rule input from user
+    const { rule } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'rule',
+        message: 'Enter the ESLint rule to fix (e.g., @typescript-eslint/no-explicit-any):',
+        validate: (input) => input.trim() !== '' || 'Please enter a valid rule name',
+      },
+    ]);
+
+    const { confirm } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: `Are you sure you want to fix all "${rule}" issues?`,
+        default: false,
+      },
+    ]);
+
+    if (!confirm) {
+      console.log(themes[currentTheme].infoStyle('Operation cancelled.'));
+      await waitForEnter();
+      return;
+    }
+
+    // Find files with rule violations
+    console.log(themes[currentTheme].infoStyle(`Finding files with ${rule} violations...`));
+    const findCmd = `npx eslint ${CONFIG.fileGlobs} --format json --rule "${rule}: error"`;
+
+    const findOutput = safeExec(findCmd, `Finding ${rule} violations`);
+
+    let eslintData = [];
     try {
-      // Get rule input from user
-      const { rule } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'rule',
-          message: 'Enter the ESLint rule to fix (e.g., @typescript-eslint/no-explicit-any):',
-          validate: input => input.trim() !== '' || 'Please enter a valid rule name'
-        }
-      ]);
-      
-      const { confirm } = await inquirer.prompt([
+      eslintData = JSON.parse(findOutput);
+    } catch (error) {
+      console.error(themes[currentTheme].errorStyle(`Error parsing ESLint output: ${error.message}`));
+      await waitForEnter();
+      return;
+    }
+
+    // Filter files with the specific rule violation
+    const affectedFiles = eslintData
+      .filter((file) => file.messages && file.messages.length > 0)
+      .filter((file) => file.messages.some((msg) => msg.ruleId === rule))
+      .map((file) => file.filePath);
+
+    if (affectedFiles.length === 0) {
+      console.log(themes[currentTheme].successStyle(`No files found with ${rule} violations.`));
+      await waitForEnter();
+      return;
+    }
+
+    console.log(themes[currentTheme].infoStyle(`Found ${affectedFiles.length} files with ${rule} violations.`));
+
+    // Ask if user wants to see affected files
+    if (affectedFiles.length > 0) {
+      const { showFiles } = await inquirer.prompt([
         {
           type: 'confirm',
-          name: 'confirm',
-          message: `Are you sure you want to fix all "${rule}" issues?`,
-          default: false
-        }
+          name: 'showFiles',
+          message: 'Do you want to see the list of affected files?',
+          default: false,
+        },
       ]);
-      
-      if (!confirm) {
-        console.log(themes[currentTheme].infoStyle('Operation cancelled.'));
-        await waitForEnter();
-        return;
+
+      if (showFiles) {
+        console.log(themes[currentTheme].titleStyle('\nAffected Files:'));
+        affectedFiles.forEach((file, index) => {
+          console.log(`${index + 1}. ${path.relative(process.cwd(), file)}`);
+        });
+        console.log('');
       }
-      
-      // Find files with rule violations
-      console.log(themes[currentTheme].infoStyle(`Finding files with ${rule} violations...`));
-      const findCmd = `npx eslint ${CONFIG.fileGlobs} --format json --rule "${rule}: error"`;
-      
-      const findOutput = safeExec(findCmd, `Finding ${rule} violations`);
-      
-      let eslintData = [];
-      try {
-        eslintData = JSON.parse(findOutput);
-      } catch (error) {
-        console.error(themes[currentTheme].errorStyle(`Error parsing ESLint output: ${error.message}`));
-        await waitForEnter();
-        return;
-      }
-      
-      // Filter files with the specific rule violation
-      const affectedFiles = eslintData
-        .filter(file => file.messages && file.messages.length > 0)
-        .filter(file => file.messages.some(msg => msg.ruleId === rule))
-        .map(file => file.filePath);
-      
-      if (affectedFiles.length === 0) {
-        console.log(themes[currentTheme].successStyle(`No files found with ${rule} violations.`));
-        await waitForEnter();
-        return;
-      }
-      
-      console.log(themes[currentTheme].infoStyle(`Found ${affectedFiles.length} files with ${rule} violations.`));
-      
-      // Ask if user wants to see affected files
-      if (affectedFiles.length > 0) {
-        const { showFiles } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'showFiles',
-            message: 'Do you want to see the list of affected files?',
-            default: false
-          }
-        ]);
-        
-        if (showFiles) {
-          console.log(themes[currentTheme].titleStyle('\nAffected Files:'));
-          affectedFiles.forEach((file, index) => {
-            console.log(`${index + 1}. ${path.relative(process.cwd(), file)}`);
-          });
-          console.log('');
-        }
-      }
-      
-      // Fix the rule violations
-      const { proceed } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'proceed',
-          message: `Proceed with fixing ${affectedFiles.length} files?`,
-          default: true
-        }
-      ]);
-      
-      if (!proceed) {
-        console.log(themes[currentTheme].infoStyle('Fix operation cancelled.'));
-        await waitForEnter();
-        return;
-      }
-      
-      // Process files in batches to avoid command line length limits
-      const batchSize = 10;
-      const batches = [];
-      
-      for (let i = 0; i < affectedFiles.length; i += batchSize) {
-        batches.push(affectedFiles.slice(i, i + batchSize));
-      }
-      
-      console.log(themes[currentTheme].infoStyle(`Fixing ${affectedFiles.length} files in ${batches.length} batches...`));
-      
-      let fixedCount = 0;
-      let errorCount = 0;
-      
-      for (let i = 0; i < batches.length; i++) {
-        const batch = batches[i];
-        const batchFiles = batch.join(' ');
-        const batchCmd = `npx eslint ${batchFiles} --fix --rule "${rule}: error"`;
-        
-        updateProgressBar(i + 1, batches.length, `Fixing batch ${i + 1}/${batches.length} (${batch.length} files)`);
-        
-        try {
-          execSync(batchCmd, { encoding: 'utf8', stdio: 'pipe' });
-          fixedCount += batch.length;
-        } catch (error) {
-          errorCount += 1;
-        }
-      }
-      
-      console.log(`\n${themes[currentTheme].successStyle(`Fixed ${fixedCount} files with ${rule} issues`)}`);
-      if (errorCount > 0) {
-        console.log(`${themes[currentTheme].warningStyle(`Encountered errors in ${errorCount} batches`)}`);
-      }
-      
-      // Verify if fixes were successful
-      console.log(themes[currentTheme].infoStyle('\nVerifying fixes...'));
-      const verifyCmd = `npx eslint ${CONFIG.fileGlobs} --format json --rule "${rule}: error"`;
-      
-      try {
-        const verifyOutput = safeExec(verifyCmd, `Verifying fixes for ${rule}`);
-        let verifyData = [];
-        
-        try {
-          verifyData = JSON.parse(verifyOutput);
-        } catch (error) {
-          console.error(themes[currentTheme].errorStyle(`Error parsing verification output: ${error.message}`));
-          await waitForEnter();
-          return;
-        }
-        
-        const remainingIssues = verifyData
-          .filter(file => file.messages && file.messages.length > 0)
-          .filter(file => file.messages.some(msg => msg.ruleId === rule));
-        
-        if (remainingIssues.length === 0) {
-          console.log(themes[currentTheme].successStyle(`All ${rule} issues have been fixed successfully!`));
-        } else {
-          const remainingCount = remainingIssues.reduce((sum, file) => {
-            return sum + file.messages.filter(msg => msg.ruleId === rule).length;
-          }, 0);
-          
-          console.log(themes[currentTheme].warningStyle(`Remaining: ${remainingCount} issues in ${remainingIssues.length} files`));
-          
-          // Show examples of remaining issues if there are any
-          if (remainingIssues.length > 0) {
-            const { showExamples } = await inquirer.prompt([
-              {
-                type: 'confirm',
-                name: 'showExamples',
-                message: 'Do you want to see examples of remaining issues?',
-                default: true
-              }
-            ]);
-            
-            if (showExamples) {
-              const exampleFile = remainingIssues[0];
-              const examples = exampleFile.messages.filter(msg => msg.ruleId === rule).slice(0, 3);
-              
-              console.log(themes[currentTheme].titleStyle('\nExample issues that couldn\'t be auto-fixed:'));
-              examples.forEach(example => {
-                console.log(`- ${path.relative(process.cwd(), exampleFile.filePath)}:${example.line}:${example.column}: ${example.message}`);
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error(themes[currentTheme].errorStyle(`Error verifying fixes: ${error.message}`));
-      }
-      
-      // Suggest running track to update progress log
-      console.log(themes[currentTheme].infoStyle('\nSuggestion: Run the linting analysis to update your progress log.'));
-      
-    } catch (error) {
-      console.error(themes[currentTheme].errorStyle(`Error fixing rule: ${error.message}`));
     }
-    
-    await waitForEnter();
-  }
-  
-  // Compare with previous version
-  async function compareLintingVersions() {
-    console.clear();
-    displayHeader();
-    console.log("\n" + themes[currentTheme].titleStyle("✓ Compare with Previous Version"));
-    
+
+    // Fix the rule violations
+    const { proceed } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'proceed',
+        message: `Proceed with fixing ${affectedFiles.length} files?`,
+        default: true,
+      },
+    ]);
+
+    if (!proceed) {
+      console.log(themes[currentTheme].infoStyle('Fix operation cancelled.'));
+      await waitForEnter();
+      return;
+    }
+
+    // Process files in batches to avoid command line length limits
+    const batchSize = 10;
+    const batches = [];
+
+    for (let i = 0; i < affectedFiles.length; i += batchSize) {
+      batches.push(affectedFiles.slice(i, i + batchSize));
+    }
+
+    console.log(themes[currentTheme].infoStyle(`Fixing ${affectedFiles.length} files in ${batches.length} batches...`));
+
+    let fixedCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i];
+      const batchFiles = batch.join(' ');
+      const batchCmd = `npx eslint ${batchFiles} --fix --rule "${rule}: error"`;
+
+      updateProgressBar(i + 1, batches.length, `Fixing batch ${i + 1}/${batches.length} (${batch.length} files)`);
+
+      try {
+        execSync(batchCmd, { encoding: 'utf8', stdio: 'pipe' });
+        fixedCount += batch.length;
+      } catch (error) {
+        errorCount += 1;
+      }
+    }
+
+    console.log(`\n${themes[currentTheme].successStyle(`Fixed ${fixedCount} files with ${rule} issues`)}`);
+    if (errorCount > 0) {
+      console.log(`${themes[currentTheme].warningStyle(`Encountered errors in ${errorCount} batches`)}`);
+    }
+
+    // Verify if fixes were successful
+    console.log(themes[currentTheme].infoStyle('\nVerifying fixes...'));
+    const verifyCmd = `npx eslint ${CONFIG.fileGlobs} --format json --rule "${rule}: error"`;
+
     try {
-      // Check if log file exists with enough entries
-      if (!fs.existsSync(CONFIG.logFile)) {
-        console.log(themes[currentTheme].warningStyle(`No ${CONFIG.logFile} file found.`));
-        console.log(`\nRun the linting analysis first to create it.`);
+      const verifyOutput = safeExec(verifyCmd, `Verifying fixes for ${rule}`);
+      let verifyData = [];
+
+      try {
+        verifyData = JSON.parse(verifyOutput);
+      } catch (error) {
+        console.error(themes[currentTheme].errorStyle(`Error parsing verification output: ${error.message}`));
         await waitForEnter();
         return;
       }
-      
-      // Read the log file
-      const logContent = fs.readFileSync(CONFIG.logFile, 'utf8');
-      const logLines = logContent.split('\n').filter(line => line.trim());
-      
-      // Parse the log entries
-      const entries = [];
-      let currentDate = '';
-      
-      logLines.forEach(line => {
-        if (line.startsWith('===== ')) {
-          currentDate = line.replace(/=+/g, '').trim();
-        } else if (line.includes('problems')) {
-          const match = line.match(
-            /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/
-          );
-          if (match) {
-            entries.push({
-              date: currentDate,
-              total: parseInt(match[1], 10),
-              errors: parseInt(match[2], 10),
-              warnings: parseInt(match[3], 10),
-              formatting: match[4] ? parseInt(match[4], 10) : 0,
+
+      const remainingIssues = verifyData
+        .filter((file) => file.messages && file.messages.length > 0)
+        .filter((file) => file.messages.some((msg) => msg.ruleId === rule));
+
+      if (remainingIssues.length === 0) {
+        console.log(themes[currentTheme].successStyle(`All ${rule} issues have been fixed successfully!`));
+      } else {
+        const remainingCount = remainingIssues.reduce((sum, file) => sum + file.messages.filter((msg) => msg.ruleId === rule).length, 0);
+
+        console.log(themes[currentTheme].warningStyle(`Remaining: ${remainingCount} issues in ${remainingIssues.length} files`));
+
+        // Show examples of remaining issues if there are any
+        if (remainingIssues.length > 0) {
+          const { showExamples } = await inquirer.prompt([
+            {
+              type: 'confirm',
+              name: 'showExamples',
+              message: 'Do you want to see examples of remaining issues?',
+              default: true,
+            },
+          ]);
+
+          if (showExamples) {
+            const exampleFile = remainingIssues[0];
+            const examples = exampleFile.messages.filter((msg) => msg.ruleId === rule).slice(0, 3);
+
+            console.log(themes[currentTheme].titleStyle('\nExample issues that couldn\'t be auto-fixed:'));
+            examples.forEach((example) => {
+              console.log(`- ${path.relative(process.cwd(), exampleFile.filePath)}:${example.line}:${example.column}: ${example.message}`);
             });
           }
         }
-      });
-      
-      if (entries.length < 2) {
-        console.log(themes[currentTheme].warningStyle('Not enough historical data for comparison.'));
-        console.log('Run the linting analysis at least twice to enable comparison.');
-        await waitForEnter();
-        return;
       }
-      
-      // Ask which versions to compare
-      const versions = entries.map((entry, index) => ({
-        name: `${entry.date}: ${entry.total} issues (${entry.errors} errors, ${entry.warnings} warnings${entry.formatting ? `, ${entry.formatting} formatting` : ''})`,
-        value: index
-      }));
-      
-      const { baseVersion, targetVersion } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'baseVersion',
-          message: 'Select base version:',
-          choices: versions
-        },
-        {
-          type: 'list',
-          name: 'targetVersion',
-          message: 'Select target version:',
-          choices: versions,
-          default: versions.length - 1
-        }
-      ]);
-      
-      const base = entries[baseVersion];
-      const target = entries[targetVersion];
-      
-      // Calculate the differences
-      const totalDiff = target.total - base.total;
-      const errorsDiff = target.errors - base.errors;
-      const warningsDiff = target.warnings - base.warnings;
-      const formattingDiff = (target.formatting || 0) - (base.formatting || 0);
-      
-      // Display comparison
-      console.log(`\n${themes[currentTheme].titleStyle("Comparison Results:")}`);
-      console.log(`\nFrom: ${base.date} (${base.total} total issues)`);
-      console.log(`To:   ${target.date} (${target.total} total issues)`);
-      
-      console.log(`\n${themes[currentTheme].titleStyle("Changes:")}`);
-      
-      const totalStyle = totalDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
-      const errorsStyle = errorsDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
-      const warningsStyle = warningsDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
-      const formattingStyle = formattingDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
-      
-      console.log(`Total Issues:      ${totalStyle(`${totalDiff > 0 ? '+' : ''}${totalDiff} (${Math.abs(totalDiff / base.total * 100).toFixed(1)}%)`)}`);
-      console.log(`Errors:            ${errorsStyle(`${errorsDiff > 0 ? '+' : ''}${errorsDiff} (${Math.abs(errorsDiff / (base.errors || 1) * 100).toFixed(1)}%)`)}`);
-      console.log(`Warnings:          ${warningsStyle(`${warningsDiff > 0 ? '+' : ''}${warningsDiff} (${Math.abs(warningsDiff / (base.warnings || 1) * 100).toFixed(1)}%)`)}`);
-      if (base.formatting || target.formatting) {
-        console.log(`Formatting Issues: ${formattingStyle(`${formattingDiff > 0 ? '+' : ''}${formattingDiff} (${Math.abs(formattingDiff / (base.formatting || 1) * 100).toFixed(1)}%)`)}`);
-      }
-      
-      // Calculate days between versions
-      const daysBetween = Math.max(1, (new Date(target.date) - new Date(base.date)) / (1000 * 60 * 60 * 24));
-      const fixRate = totalDiff < 0 ? Math.abs(totalDiff) / daysBetween : 0;
-      
-      if (totalDiff < 0) {
-        console.log(`\n${themes[currentTheme].infoStyle(`Average fix rate: ${fixRate.toFixed(2)} issues per day`)}`);
-        
-        // Estimate completion if progress is positive
-        const daysRemaining = Math.ceil(target.total / fixRate);
-        const completionDate = new Date();
-        completionDate.setDate(completionDate.getDate() + daysRemaining);
-        
-        console.log(`${themes[currentTheme].infoStyle(`Estimated completion: ${daysRemaining} days (around ${completionDate.toLocaleDateString()})`)}`);
-      } else if (totalDiff > 0) {
-        console.log(`\n${themes[currentTheme].warningStyle(`Issue count is increasing at ${(Math.abs(totalDiff) / daysBetween).toFixed(2)} issues per day`)}`);
-      } else {
-        console.log(`\n${themes[currentTheme].infoStyle('No change in total issues.')}`);
-      }
-      
     } catch (error) {
-      console.error(themes[currentTheme].errorStyle(`Error comparing versions: ${error.message}`));
+      console.error(themes[currentTheme].errorStyle(`Error verifying fixes: ${error.message}`));
     }
-    
-    await waitForEnter();
+
+    // Suggest running track to update progress log
+    console.log(themes[currentTheme].infoStyle('\nSuggestion: Run the linting analysis to update your progress log.'));
+
+  } catch (error) {
+    console.error(themes[currentTheme].errorStyle(`Error fixing rule: ${error.message}`));
   }
-  
-  // Change theme
-  async function changeTheme() {
-    console.clear();
-    displayHeader();
-    console.log("\n" + themes[currentTheme].titleStyle("✓ Change Theme"));
-    
-    // Build a simple ASCII table for theme selection
-    const indent = "          ";
-    const colWidth = 12;
-    const keys = Object.keys(themes);
-    
-    const topBorder = indent + "┏" + "━".repeat(6) + "┳" + "━".repeat(colWidth) + "┓";
-    const headerRow = indent + "┃" + centerText("Index", 6) + "┃" + padRight("Theme Name", colWidth) + "┃";
-    const headerSep = indent + "┡" + "━".repeat(6) + "╇" + "━".repeat(colWidth) + "┩";
-    
-    let rows = "";
-    keys.forEach((key, idx) => {
-      const row = indent + "│" + centerText((idx + 1).toString(), 6) + "│" + padRight(key.charAt(0).toUpperCase() + key.slice(1), colWidth) + "│";
-      rows += row + "\n";
+
+  await waitForEnter();
+}
+
+// Compare with previous version
+async function compareLintingVersions() {
+  console.clear();
+  displayHeader();
+  console.log('\n' + themes[currentTheme].titleStyle('✓ Compare with Previous Version'));
+
+  try {
+    // Check if log file exists with enough entries
+    if (!fs.existsSync(CONFIG.logFile)) {
+      console.log(themes[currentTheme].warningStyle(`No ${CONFIG.logFile} file found.`));
+      console.log('\nRun the linting analysis first to create it.');
+      await waitForEnter();
+      return;
+    }
+
+    // Read the log file
+    const logContent = fs.readFileSync(CONFIG.logFile, 'utf8');
+    const logLines = logContent.split('\n').filter((line) => line.trim());
+
+    // Parse the log entries
+    const entries = [];
+    let currentDate = '';
+
+    logLines.forEach((line) => {
+      if (line.startsWith('===== ')) {
+        currentDate = line.replace(/=+/g, '').trim();
+      } else if (line.includes('problems')) {
+        const match = line.match(
+          /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/,
+        );
+        if (match) {
+          entries.push({
+            date: currentDate,
+            total: parseInt(match[1], 10),
+            errors: parseInt(match[2], 10),
+            warnings: parseInt(match[3], 10),
+            formatting: match[4] ? parseInt(match[4], 10) : 0,
+          });
+        }
+      }
     });
-    
-    const bottomBorder = indent + "└" + "─".repeat(6) + "┴" + "─".repeat(colWidth) + "┘";
-    
-    console.log(topBorder);
-    console.log(headerRow);
-    console.log(headerSep);
-    console.log(rows.trimEnd());
-    console.log(bottomBorder);
-    
-    const { themeChoice } = await inquirer.prompt([
+
+    if (entries.length < 2) {
+      console.log(themes[currentTheme].warningStyle('Not enough historical data for comparison.'));
+      console.log('Run the linting analysis at least twice to enable comparison.');
+      await waitForEnter();
+      return;
+    }
+
+    // Ask which versions to compare
+    const versions = entries.map((entry, index) => ({
+      name: `${entry.date}: ${entry.total} issues (${entry.errors} errors, ${entry.warnings} warnings${entry.formatting ? `, ${entry.formatting} formatting` : ''})`,
+      value: index,
+    }));
+
+    const { baseVersion, targetVersion } = await inquirer.prompt([
       {
         type: 'list',
-        name: 'themeChoice',
-        message: 'Select a theme:',
-        choices: keys.map((key, idx) => ({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value: key
-        })),
-        default: currentTheme
-      }
+        name: 'baseVersion',
+        message: 'Select base version:',
+        choices: versions,
+      },
+      {
+        type: 'list',
+        name: 'targetVersion',
+        message: 'Select target version:',
+        choices: versions,
+        default: versions.length - 1,
+      },
     ]);
-    
-    currentTheme = themeChoice;
-    console.log(themes[currentTheme].successStyle(`Theme changed to ${themeChoice.charAt(0).toUpperCase() + themeChoice.slice(1)}.`));
-    
-    await waitForEnter();
-  }
-  
-  // Generate and display progress chart
-  async function viewProgressChart() {
-    console.clear();
-    displayHeader();
-    console.log("\n" + themes[currentTheme].titleStyle("✓ Viewing Progress & Statistics"));
-  
-    try {
-      // Check if log file exists
-      if (!fs.existsSync(CONFIG.logFile)) {
-        console.log(`${themes[currentTheme].warningStyle(`No ${CONFIG.logFile} file found.`)}`);
-        console.log(`\nRun the linting analysis first to create it.`);
-        await waitForEnter();
-        return;
-      }
-  
-      // Read the log file
-      const logContent = fs.readFileSync(CONFIG.logFile, 'utf8');
-      const logLines = logContent.split('\n').filter(line => line.trim());
-  
-      console.log(`Read ${logLines.length} lines from log file`);
-  
-      // Parse the log entries
-      const entries = [];
-      let currentDate = '';
-  
-      console.log('Parsing log entries...');
-      logLines.forEach((line, index) => {
-        updateProgressBar(index + 1, logLines.length, `Parsing line ${index + 1}/${logLines.length}`);
-  
-        if (line.startsWith('===== ')) {
-          // This is a date line
-          currentDate = line.replace(/=+/g, '').trim();
-        } else if (line.includes('problems')) {
-          // This is a problems line from ESLint output
-          const match = line.match(
-            /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/
-          );
-          if (match) {
-            entries.push({
-              date: currentDate,
-              total: parseInt(match[1], 10),
-              errors: parseInt(match[2], 10),
-              warnings: parseInt(match[3], 10),
-              formatting: match[4] ? parseInt(match[4], 10) : 0,
-            });
-          }
-        }
-      });
-  
-      if (entries.length === 0) {
-        console.log(`\n${themes[currentTheme].warningStyle(`No data entries found in ${CONFIG.logFile}`)}`);
-        console.log('Make sure the file contains entries in the correct format:');
-        console.log('===== DATE =====');
-        console.log('X problems (Y errors, Z warnings)');
-        await waitForEnter();
-        return;
-      }
-  
-      // Find the maximum number of issues to scale the chart
-      const maxIssues = Math.max(...entries.map(e => e.total));
-      const scale = 40; // Maximum width of chart
-  
-      console.log(
-        `\n${themes[currentTheme].titleStyle("=== ESLINT/PRETTIER LINTING PROGRESS CHART ===")}`
-      );
-      console.log(`${themes[currentTheme].optionStyle("Date       | Errors | Warnings | Format | Progress")}`);
-      console.log('-'.repeat(70));
-  
-      entries.forEach(entry => {
-        const dateStr = entry.date.substring(0, 10);
-        const errorsStr = entry.errors.toString().padStart(6);
-        const warningsStr = entry.warnings.toString().padStart(8);
-        const formattingStr = (entry.formatting || 0).toString().padStart(6);
-  
-        // Calculate bar length proportional to issues
-        const progress = Math.floor((1 - entry.total / maxIssues) * 100);
-        const barLength = Math.floor((scale * entry.total) / maxIssues);
-        const bar = '█'.repeat(scale - barLength) + '░'.repeat(barLength);
-  
-        // Color-code based on progress
-        let progressStyle = themes[currentTheme].errorStyle;
-        if (progress >= 75) {
-          progressStyle = themes[currentTheme].successStyle;
-        } else if (progress >= 50) {
-          progressStyle = themes[currentTheme].infoStyle;
-        } else if (progress >= 25) {
-          progressStyle = themes[currentTheme].warningStyle;
-        }
-  
-        console.log(
-          `${dateStr} | ${themes[currentTheme].errorStyle(errorsStr)} | ${themes[currentTheme].warningStyle(warningsStr)} | ${themes[currentTheme].infoStyle(formattingStr)} | ${progressStyle(`${bar} ${progress}%`)}`
-        );
-      });
-  
-      // Show trend information
-      if (entries.length >= 2) {
-        const first = entries[0];
-        const last = entries[entries.length - 1];
-        const reduction = first.total - last.total;
-        const percentReduction = ((reduction / first.total) * 100).toFixed(1);
-  
-        console.log(`\n${themes[currentTheme].titleStyle("=== TREND ANALYSIS ===")}`);
-        console.log(`Starting issues: ${themes[currentTheme].optionStyle(`${first.total}`)}`);
-        console.log(`Current issues: ${themes[currentTheme].optionStyle(`${last.total}`)}`);
-  
-        const reductionStyle = reduction > 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
-        console.log(
-          `Issues fixed: ${reductionStyle(`${reduction} (${percentReduction}%)`)}`
-        );
-  
-        // Estimate completion
-        if (reduction > 0) {
-          const daysElapsed = (new Date(last.date) - new Date(first.date)) / (1000 * 60 * 60 * 24);
-          const fixRate = reduction / Math.max(1, daysElapsed);
-          const daysRemaining = Math.ceil(last.total / fixRate);
-  
-          const completionDate = new Date();
-          completionDate.setDate(completionDate.getDate() + daysRemaining);
-  
-          console.log(
-            `Average fix rate: ${themes[currentTheme].infoStyle(`${fixRate.toFixed(1)} issues per day`)}`
-          );
-          console.log(
-            `Estimated completion: ${themes[currentTheme].optionStyle(`${daysRemaining} days`)} (around ${themes[currentTheme].successStyle(`${completionDate.toLocaleDateString()}`)})`
-          );
-  
-          // Show additional stats
-          console.log(`\n${themes[currentTheme].titleStyle("=== DETAILED ANALYSIS ===")}`);
-  
-          // Error reduction
-          const errorReduction = first.errors - last.errors;
-          const errorPercentReduction = (
-            (errorReduction / Math.max(1, first.errors)) *
-            100
-          ).toFixed(1);
-          console.log(
-            `Error reduction: ${themes[currentTheme].errorStyle(`${errorReduction} (${errorPercentReduction}%)`)}`
-          );
-  
-          // Warning reduction
-          const warningReduction = first.warnings - last.warnings;
-          const warningPercentReduction = (
-            (warningReduction / Math.max(1, first.warnings)) *
-            100
-          ).toFixed(1);
-          console.log(
-            `Warning reduction: ${themes[currentTheme].warningStyle(`${warningReduction} (${warningPercentReduction}%)`)}`
-          );
-  
-          // Formatting reduction if available
-          if (first.formatting || last.formatting) {
-            const formattingReduction = (first.formatting || 0) - (last.formatting || 0);
-            const formattingPercentReduction = (
-              (formattingReduction / Math.max(1, first.formatting || 1)) *
-              100
-            ).toFixed(1);
-            console.log(
-              `Formatting reduction: ${themes[currentTheme].infoStyle(`${formattingReduction} (${formattingPercentReduction}%)`)}`
-            );
-          }
-        }
-      }
-  
-      // Check if detailed data is available
-      const jsonPath = path.join(CONFIG.reportDir, CONFIG.jsonFilename);
-      if (fs.existsSync(jsonPath)) {
-        try {
-          const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-          
-          // Display file statistics
-          if (jsonData.worstFiles && jsonData.worstFiles.length > 0) {
-            console.log(`\n${themes[currentTheme].titleStyle("=== FILES WITH MOST ISSUES ===")}`);
-            jsonData.worstFiles.slice(0, 5).forEach((file, index) => {
-              console.log(`${index + 1}. ${file.file}: ${themes[currentTheme].errorStyle(file.errors.toString())} errors, ${themes[currentTheme].warningStyle(file.warnings.toString())} warnings`);
-            });
-          }
-          
-          // Display directory statistics
-          if (jsonData.issuesByDirectory && jsonData.issuesByDirectory.length > 0) {
-            console.log(`\n${themes[currentTheme].titleStyle("=== DIRECTORY BREAKDOWN ===")}`);
-            const topDirs = jsonData.issuesByDirectory.slice(0, 5);
-            
-            // Find max issues for bar scaling
-            const maxDirIssues = Math.max(...topDirs.map(d => d.total));
-            const barScale = 20; // Scale for the bar chart
-            
-            topDirs.forEach((dir, index) => {
-              const barLength = Math.floor((dir.total / maxDirIssues) * barScale);
-              const bar = '█'.repeat(barLength);
-              console.log(`${index + 1}. ${dir.directory.padEnd(30)}: ${bar} ${dir.total} (${dir.errors} errors, ${dir.warnings} warnings)`);
-            });
-          }
-        } catch (error) {
-          console.log(`${themes[currentTheme].warningStyle('Could not load detailed statistics')}`);
-        }
-      }
-    } catch (error) {
-      console.error(`\nError reading log file: ${error.message}`);
+
+    const base = entries[baseVersion];
+    const target = entries[targetVersion];
+
+    // Calculate the differences
+    const totalDiff = target.total - base.total;
+    const errorsDiff = target.errors - base.errors;
+    const warningsDiff = target.warnings - base.warnings;
+    const formattingDiff = (target.formatting || 0) - (base.formatting || 0);
+
+    // Display comparison
+    console.log(`\n${themes[currentTheme].titleStyle('Comparison Results:')}`);
+    console.log(`\nFrom: ${base.date} (${base.total} total issues)`);
+    console.log(`To:   ${target.date} (${target.total} total issues)`);
+
+    console.log(`\n${themes[currentTheme].titleStyle('Changes:')}`);
+
+    const totalStyle = totalDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
+    const errorsStyle = errorsDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
+    const warningsStyle = warningsDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
+    const formattingStyle = formattingDiff <= 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
+
+    console.log(`Total Issues:      ${totalStyle(`${totalDiff > 0 ? '+' : ''}${totalDiff} (${Math.abs(totalDiff / base.total * 100).toFixed(1)}%)`)}`);
+    console.log(`Errors:            ${errorsStyle(`${errorsDiff > 0 ? '+' : ''}${errorsDiff} (${Math.abs(errorsDiff / (base.errors || 1) * 100).toFixed(1)}%)`)}`);
+    console.log(`Warnings:          ${warningsStyle(`${warningsDiff > 0 ? '+' : ''}${warningsDiff} (${Math.abs(warningsDiff / (base.warnings || 1) * 100).toFixed(1)}%)`)}`);
+    if (base.formatting || target.formatting) {
+      console.log(`Formatting Issues: ${formattingStyle(`${formattingDiff > 0 ? '+' : ''}${formattingDiff} (${Math.abs(formattingDiff / (base.formatting || 1) * 100).toFixed(1)}%)`)}`);
     }
-  
-    await waitForEnter();
+
+    // Calculate days between versions
+    const daysBetween = Math.max(1, (new Date(target.date) - new Date(base.date)) / (1000 * 60 * 60 * 24));
+    const fixRate = totalDiff < 0 ? Math.abs(totalDiff) / daysBetween : 0;
+
+    if (totalDiff < 0) {
+      console.log(`\n${themes[currentTheme].infoStyle(`Average fix rate: ${fixRate.toFixed(2)} issues per day`)}`);
+
+      // Estimate completion if progress is positive
+      const daysRemaining = Math.ceil(target.total / fixRate);
+      const completionDate = new Date();
+      completionDate.setDate(completionDate.getDate() + daysRemaining);
+
+      console.log(`${themes[currentTheme].infoStyle(`Estimated completion: ${daysRemaining} days (around ${completionDate.toLocaleDateString()})`)}`);
+    } else if (totalDiff > 0) {
+      console.log(`\n${themes[currentTheme].warningStyle(`Issue count is increasing at ${(Math.abs(totalDiff) / daysBetween).toFixed(2)} issues per day`)}`);
+    } else {
+      console.log(`\n${themes[currentTheme].infoStyle('No change in total issues.')}`);
+    }
+
+  } catch (error) {
+    console.error(themes[currentTheme].errorStyle(`Error comparing versions: ${error.message}`));
   }
+
+  await waitForEnter();
+}
+
+// Change theme
+async function changeTheme() {
+  console.clear();
+  displayHeader();
+  console.log('\n' + themes[currentTheme].titleStyle('✓ Change Theme'));
+
+  // Build a simple ASCII table for theme selection
+  const indent = '          ';
+  const colWidth = 12;
+  const keys = Object.keys(themes);
+
+  const topBorder = indent + '┏' + '━'.repeat(6) + '┳' + '━'.repeat(colWidth) + '┓';
+  const headerRow = indent + '┃' + centerText('Index', 6) + '┃' + padRight('Theme Name', colWidth) + '┃';
+  const headerSep = indent + '┡' + '━'.repeat(6) + '╇' + '━'.repeat(colWidth) + '┩';
+
+  let rows = '';
+  keys.forEach((key, idx) => {
+    const row = indent + '│' + centerText((idx + 1).toString(), 6) + '│' + padRight(key.charAt(0).toUpperCase() + key.slice(1), colWidth) + '│';
+    rows += row + '\n';
+  });
+
+  const bottomBorder = indent + '└' + '─'.repeat(6) + '┴' + '─'.repeat(colWidth) + '┘';
+
+  console.log(topBorder);
+  console.log(headerRow);
+  console.log(headerSep);
+  console.log(rows.trimEnd());
+  console.log(bottomBorder);
+
+  const { themeChoice } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'themeChoice',
+      message: 'Select a theme:',
+      choices: keys.map((key, idx) => ({
+        name: key.charAt(0).toUpperCase() + key.slice(1),
+        value: key,
+      })),
+      default: currentTheme,
+    },
+  ]);
+
+  currentTheme = themeChoice;
+  console.log(themes[currentTheme].successStyle(`Theme changed to ${themeChoice.charAt(0).toUpperCase() + themeChoice.slice(1)}.`));
+
+  await waitForEnter();
+}
+
+// Generate and display progress chart
+async function viewProgressChart() {
+  console.clear();
+  displayHeader();
+  console.log('\n' + themes[currentTheme].titleStyle('✓ Viewing Progress & Statistics'));
+
+  try {
+    // Check if log file exists
+    if (!fs.existsSync(CONFIG.logFile)) {
+      console.log(`${themes[currentTheme].warningStyle(`No ${CONFIG.logFile} file found.`)}`);
+      console.log('\nRun the linting analysis first to create it.');
+      await waitForEnter();
+      return;
+    }
+
+    // Read the log file
+    const logContent = fs.readFileSync(CONFIG.logFile, 'utf8');
+    const logLines = logContent.split('\n').filter((line) => line.trim());
+
+    console.log(`Read ${logLines.length} lines from log file`);
+
+    // Parse the log entries
+    const entries = [];
+    let currentDate = '';
+
+    console.log('Parsing log entries...');
+    logLines.forEach((line, index) => {
+      updateProgressBar(index + 1, logLines.length, `Parsing line ${index + 1}/${logLines.length}`);
+
+      if (line.startsWith('===== ')) {
+        // This is a date line
+        currentDate = line.replace(/=+/g, '').trim();
+      } else if (line.includes('problems')) {
+        // This is a problems line from ESLint output
+        const match = line.match(
+          /(\d+) problems? \((\d+) errors?, (\d+) warnings?(?:, (\d+) formatting)?\)/,
+        );
+        if (match) {
+          entries.push({
+            date: currentDate,
+            total: parseInt(match[1], 10),
+            errors: parseInt(match[2], 10),
+            warnings: parseInt(match[3], 10),
+            formatting: match[4] ? parseInt(match[4], 10) : 0,
+          });
+        }
+      }
+    });
+
+    if (entries.length === 0) {
+      console.log(`\n${themes[currentTheme].warningStyle(`No data entries found in ${CONFIG.logFile}`)}`);
+      console.log('Make sure the file contains entries in the correct format:');
+      console.log('===== DATE =====');
+      console.log('X problems (Y errors, Z warnings)');
+      await waitForEnter();
+      return;
+    }
+
+    // Find the maximum number of issues to scale the chart
+    const maxIssues = Math.max(...entries.map((e) => e.total));
+    const scale = 40; // Maximum width of chart
+
+    console.log(
+      `\n${themes[currentTheme].titleStyle('=== ESLINT/PRETTIER LINTING PROGRESS CHART ===')}`,
+    );
+    console.log(`${themes[currentTheme].optionStyle('Date       | Errors | Warnings | Format | Progress')}`);
+    console.log('-'.repeat(70));
+
+    entries.forEach((entry) => {
+      const dateStr = entry.date.substring(0, 10);
+      const errorsStr = entry.errors.toString().padStart(6);
+      const warningsStr = entry.warnings.toString().padStart(8);
+      const formattingStr = (entry.formatting || 0).toString().padStart(6);
+
+      // Calculate bar length proportional to issues
+      const progress = Math.floor((1 - entry.total / maxIssues) * 100);
+      const barLength = Math.floor((scale * entry.total) / maxIssues);
+      const bar = '█'.repeat(scale - barLength) + '░'.repeat(barLength);
+
+      // Color-code based on progress
+      let progressStyle = themes[currentTheme].errorStyle;
+      if (progress >= 75) {
+        progressStyle = themes[currentTheme].successStyle;
+      } else if (progress >= 50) {
+        progressStyle = themes[currentTheme].infoStyle;
+      } else if (progress >= 25) {
+        progressStyle = themes[currentTheme].warningStyle;
+      }
+
+      console.log(
+        `${dateStr} | ${themes[currentTheme].errorStyle(errorsStr)} | ${themes[currentTheme].warningStyle(warningsStr)} | ${themes[currentTheme].infoStyle(formattingStr)} | ${progressStyle(`${bar} ${progress}%`)}`,
+      );
+    });
+
+    // Show trend information
+    if (entries.length >= 2) {
+      const first = entries[0];
+      const last = entries[entries.length - 1];
+      const reduction = first.total - last.total;
+      const percentReduction = ((reduction / first.total) * 100).toFixed(1);
+
+      console.log(`\n${themes[currentTheme].titleStyle('=== TREND ANALYSIS ===')}`);
+      console.log(`Starting issues: ${themes[currentTheme].optionStyle(`${first.total}`)}`);
+      console.log(`Current issues: ${themes[currentTheme].optionStyle(`${last.total}`)}`);
+
+      const reductionStyle = reduction > 0 ? themes[currentTheme].successStyle : themes[currentTheme].errorStyle;
+      console.log(
+        `Issues fixed: ${reductionStyle(`${reduction} (${percentReduction}%)`)}`,
+      );
+
+      // Estimate completion
+      if (reduction > 0) {
+        const daysElapsed = (new Date(last.date) - new Date(first.date)) / (1000 * 60 * 60 * 24);
+        const fixRate = reduction / Math.max(1, daysElapsed);
+        const daysRemaining = Math.ceil(last.total / fixRate);
+
+        const completionDate = new Date();
+        completionDate.setDate(completionDate.getDate() + daysRemaining);
+
+        console.log(
+          `Average fix rate: ${themes[currentTheme].infoStyle(`${fixRate.toFixed(1)} issues per day`)}`,
+        );
+        console.log(
+          `Estimated completion: ${themes[currentTheme].optionStyle(`${daysRemaining} days`)} (around ${themes[currentTheme].successStyle(`${completionDate.toLocaleDateString()}`)})`,
+        );
+
+        // Show additional stats
+        console.log(`\n${themes[currentTheme].titleStyle('=== DETAILED ANALYSIS ===')}`);
+
+        // Error reduction
+        const errorReduction = first.errors - last.errors;
+        const errorPercentReduction = (
+          (errorReduction / Math.max(1, first.errors)) *
+            100
+        ).toFixed(1);
+        console.log(
+          `Error reduction: ${themes[currentTheme].errorStyle(`${errorReduction} (${errorPercentReduction}%)`)}`,
+        );
+
+        // Warning reduction
+        const warningReduction = first.warnings - last.warnings;
+        const warningPercentReduction = (
+          (warningReduction / Math.max(1, first.warnings)) *
+            100
+        ).toFixed(1);
+        console.log(
+          `Warning reduction: ${themes[currentTheme].warningStyle(`${warningReduction} (${warningPercentReduction}%)`)}`,
+        );
+
+        // Formatting reduction if available
+        if (first.formatting || last.formatting) {
+          const formattingReduction = (first.formatting || 0) - (last.formatting || 0);
+          const formattingPercentReduction = (
+            (formattingReduction / Math.max(1, first.formatting || 1)) *
+              100
+          ).toFixed(1);
+          console.log(
+            `Formatting reduction: ${themes[currentTheme].infoStyle(`${formattingReduction} (${formattingPercentReduction}%)`)}`,
+          );
+        }
+      }
+    }
+
+    // Check if detailed data is available
+    const jsonPath = path.join(CONFIG.reportDir, CONFIG.jsonFilename);
+    if (fs.existsSync(jsonPath)) {
+      try {
+        const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+
+        // Display file statistics
+        if (jsonData.worstFiles && jsonData.worstFiles.length > 0) {
+          console.log(`\n${themes[currentTheme].titleStyle('=== FILES WITH MOST ISSUES ===')}`);
+          jsonData.worstFiles.slice(0, 5).forEach((file, index) => {
+            console.log(`${index + 1}. ${file.file}: ${themes[currentTheme].errorStyle(file.errors.toString())} errors, ${themes[currentTheme].warningStyle(file.warnings.toString())} warnings`);
+          });
+        }
+
+        // Display directory statistics
+        if (jsonData.issuesByDirectory && jsonData.issuesByDirectory.length > 0) {
+          console.log(`\n${themes[currentTheme].titleStyle('=== DIRECTORY BREAKDOWN ===')}`);
+          const topDirs = jsonData.issuesByDirectory.slice(0, 5);
+
+          // Find max issues for bar scaling
+          const maxDirIssues = Math.max(...topDirs.map((d) => d.total));
+          const barScale = 20; // Scale for the bar chart
+
+          topDirs.forEach((dir, index) => {
+            const barLength = Math.floor((dir.total / maxDirIssues) * barScale);
+            const bar = '█'.repeat(barLength);
+            console.log(`${index + 1}. ${dir.directory.padEnd(30)}: ${bar} ${dir.total} (${dir.errors} errors, ${dir.warnings} warnings)`);
+          });
+        }
+      } catch (error) {
+        console.log(`${themes[currentTheme].warningStyle('Could not load detailed statistics')}`);
+      }
+    }
+  } catch (error) {
+    console.error(`\nError reading log file: ${error.message}`);
+  }
+
+  await waitForEnter();
+}

@@ -1,0 +1,153 @@
+{
+  "timestamp": "2025-03-02T02:15:19.803Z",
+  "stats": {
+    "totalFiles": 16,
+    "filesWithIssues": 12,
+    "errors": 2,
+    "warnings": 96
+  },
+  "worstFiles": [
+    {
+      "file": "legacy_files/cli-one.mjs",
+      "total": 25,
+      "errors": 1,
+      "warnings": 24
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/interactive.js",
+      "total": 22,
+      "errors": 0,
+      "warnings": 22
+    },
+    {
+      "file": "src/lint-toolbox/bin/cli.mjs",
+      "total": 13,
+      "errors": 0,
+      "warnings": 13
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/compare.js",
+      "total": 8,
+      "errors": 0,
+      "warnings": 8
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/track.js",
+      "total": 8,
+      "errors": 0,
+      "warnings": 8
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/html.js",
+      "total": 7,
+      "errors": 1,
+      "warnings": 6
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/chart.js",
+      "total": 6,
+      "errors": 0,
+      "warnings": 6
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/fix.js",
+      "total": 4,
+      "errors": 0,
+      "warnings": 4
+    },
+    {
+      "file": "legacy_files/setup-lint-toolbox.js",
+      "total": 2,
+      "errors": 0,
+      "warnings": 2
+    },
+    {
+      "file": "src/lint-toolbox/index.js",
+      "total": 1,
+      "errors": 0,
+      "warnings": 1
+    },
+    {
+      "file": "src/lint-toolbox/lib/cli.js",
+      "total": 1,
+      "errors": 0,
+      "warnings": 1
+    },
+    {
+      "file": "src/lint-toolbox/lib/commands/theme.js",
+      "total": 1,
+      "errors": 0,
+      "warnings": 1
+    }
+  ],
+  "issuesByDirectory": [
+    {
+      "directory": "src/lint-toolbox/lib/commands",
+      "errors": 1,
+      "warnings": 55,
+      "total": 56
+    },
+    {
+      "directory": "legacy_files",
+      "errors": 1,
+      "warnings": 26,
+      "total": 27
+    },
+    {
+      "directory": "src/lint-toolbox/bin",
+      "errors": 0,
+      "warnings": 13,
+      "total": 13
+    },
+    {
+      "directory": "src/lint-toolbox",
+      "errors": 0,
+      "warnings": 1,
+      "total": 1
+    },
+    {
+      "directory": "src/lint-toolbox/lib",
+      "errors": 0,
+      "warnings": 1,
+      "total": 1
+    }
+  ],
+  "ruleStats": [
+    {
+      "rule": "no-unused-vars",
+      "count": 40
+    },
+    {
+      "rule": "no-await-in-loop",
+      "count": 34
+    },
+    {
+      "rule": "no-promise-executor-return",
+      "count": 1
+    },
+    {
+      "rule": "prefer-const",
+      "count": 1
+    },
+    {
+      "rule": "max-len",
+      "count": 12
+    },
+    {
+      "rule": "require-await",
+      "count": 3
+    },
+    {
+      "rule": "no-trailing-spaces",
+      "count": 5
+    },
+    {
+      "rule": "semi",
+      "count": 1
+    },
+    {
+      "rule": "comma-dangle",
+      "count": 1
+    }
+  ]
+}

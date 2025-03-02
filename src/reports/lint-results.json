@@ -1,0 +1,141 @@
+{
+  "timestamp": "2025-03-02T07:00:20.229Z",
+  "stats": {
+    "totalFiles": 14,
+    "filesWithIssues": 11,
+    "errors": 1,
+    "warnings": 118
+  },
+  "worstFiles": [
+    {
+      "file": "lint-toolbox/lib/commands/advancedChart.js",
+      "total": 31,
+      "errors": 0,
+      "warnings": 31
+    },
+    {
+      "file": "lint-toolbox/lib/commands/html.js",
+      "total": 23,
+      "errors": 1,
+      "warnings": 22
+    },
+    {
+      "file": "lint-toolbox/lib/commands/interactive.js",
+      "total": 22,
+      "errors": 0,
+      "warnings": 22
+    },
+    {
+      "file": "lint-toolbox/bin/cli.mjs",
+      "total": 13,
+      "errors": 0,
+      "warnings": 13
+    },
+    {
+      "file": "lint-toolbox/lib/commands/compare.js",
+      "total": 8,
+      "errors": 0,
+      "warnings": 8
+    },
+    {
+      "file": "lint-toolbox/lib/commands/track.js",
+      "total": 8,
+      "errors": 0,
+      "warnings": 8
+    },
+    {
+      "file": "lint-toolbox/lib/commands/chart.js",
+      "total": 7,
+      "errors": 0,
+      "warnings": 7
+    },
+    {
+      "file": "lint-toolbox/lib/commands/fix.js",
+      "total": 4,
+      "errors": 0,
+      "warnings": 4
+    },
+    {
+      "file": "lint-toolbox/index.js",
+      "total": 1,
+      "errors": 0,
+      "warnings": 1
+    },
+    {
+      "file": "lint-toolbox/lib/cli.js",
+      "total": 1,
+      "errors": 0,
+      "warnings": 1
+    },
+    {
+      "file": "lint-toolbox/lib/commands/theme.js",
+      "total": 1,
+      "errors": 0,
+      "warnings": 1
+    }
+  ],
+  "issuesByDirectory": [
+    {
+      "directory": "lint-toolbox/lib/commands",
+      "errors": 1,
+      "warnings": 103,
+      "total": 104
+    },
+    {
+      "directory": "lint-toolbox/bin",
+      "errors": 0,
+      "warnings": 13,
+      "total": 13
+    },
+    {
+      "directory": "lint-toolbox",
+      "errors": 0,
+      "warnings": 1,
+      "total": 1
+    },
+    {
+      "directory": "lint-toolbox/lib",
+      "errors": 0,
+      "warnings": 1,
+      "total": 1
+    }
+  ],
+  "ruleStats": [
+    {
+      "rule": "no-unused-vars",
+      "count": 30
+    },
+    {
+      "rule": "no-await-in-loop",
+      "count": 26
+    },
+    {
+      "rule": "require-await",
+      "count": 3
+    },
+    {
+      "rule": "arrow-parens",
+      "count": 6
+    },
+    {
+      "rule": "max-len",
+      "count": 14
+    },
+    {
+      "rule": "comma-dangle",
+      "count": 6
+    },
+    {
+      "rule": "no-trailing-spaces",
+      "count": 31
+    },
+    {
+      "rule": "quotes",
+      "count": 2
+    },
+    {
+      "rule": "semi",
+      "count": 1
+    }
+  ]
+}
